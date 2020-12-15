@@ -26,14 +26,14 @@ class CheckoutController extends Controller
         $countryCode = explode("|", $request->prefixNumber);
         $completeNumber = preg_replace('/^0?/', '+' . $countryCode[0], $request->phone);
 
-        User::create([
-            'firstname' => $request->firstname,
-            'lastname' => $request->lastname,
-            'email' => $request->email,
-            'phone' => $completeNumber,
-            'country' => $countryCode[1],
-            'user_type' => 2
-        ]);
+        // User::create([
+        //     'firstname' => $request->firstname,
+        //     'lastname' => $request->lastname,
+        //     'email' => $request->email,
+        //     'phone' => $completeNumber,
+        //     'country' => $countryCode[1],
+        //     'user_type' => 2
+        // ]);
 
         return view('checkout.payment-method');
     }

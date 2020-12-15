@@ -21,6 +21,37 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row pt-2">
+                                <div class="col">
+                                    <h4 class="mb-4">Your Order</h4>
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="text-left"><b>Product</b></p>
+                                        </div>
+                                        <div class="col">
+                                            <p class="text-right"><b>Subtotal</b></p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="text-left">Eurasia International MUN – Early Bird × 1</p>
+                                        </div>
+                                        <div class="col">
+                                            <p class="text-right"><b>Rp. 400.000</b></p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="text-left"><b>Total</b></p>
+                                        </div>
+                                        <div class="col">
+                                            <p class="text-right"><b>Rp. 400.000</b></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row my-3">
                             </div>
                             <form method="POST" action="{{route('checkout-finish')}}" enctype="multipart/form-data">
@@ -28,38 +59,6 @@
                                 <div class=" row">
                                     <div class="col">
                                         <ul class="list-group">
-                                            <li class="list-group-item">
-                                                <div class="row el">
-                                                    <div class="col ml-3">
-                                                        <input class="form-check-input perkdrop1" type="radio" name="payment-type" value="direct-transfer">
-                                                        <label class="form-check-label" for="gridRadios1"><i class="fa fa-university" aria-hidden="true"></i> Bank Transfer</label>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col ml-3">
-                                                        <img src="{{ asset('images/logobank.png') }}" class="img-fluid my-2">
-                                                    </div>
-                                                </div>
-                                                <div class="dropdown dp1">
-                                                    <div>
-                                                        <h5 class="text-center">Bank account details</h5>
-                                                        <dl class="mt-2">
-                                                            <dt>Bank</dt>
-                                                            <dd> THE WORLD BANK</dd>
-                                                        </dl>
-                                                        <dl>
-                                                            <dt>Account number</dt>
-                                                            <dd>7775877975</dd>
-                                                        </dl>
-                                                        <dl>
-                                                            <dt>IBAN</dt>
-                                                            <dd>CZ7775877975656</dd>
-                                                        </dl>
-                                                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </li>
                                             <li class="list-group-item">
                                                 <div class="row el">
                                                     <div class="col ml-3">
@@ -107,6 +106,40 @@
                                                     </div>
                                                 </div>
                                             </li>
+                                            <li class="list-group-item">
+                                                <div class="row el">
+                                                    <div class="col ml-3">
+                                                        <input class="form-check-input perkdrop1" type="radio" name="payment-type" value="direct-transfer">
+                                                        <label class="form-check-label" for="gridRadios1"><i class="fa fa-university" aria-hidden="true"></i> Bank Transfer</label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col ml-3">
+                                                        <img src="{{ asset('images/logobank.png') }}" class="img-fluid my-2">
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown dp1">
+                                                    <div>
+                                                        <h5 class="text-center">Bank account details</h5>
+                                                        <dl class="mt-2">
+                                                            <dt>Bank</dt>
+                                                            <dd> THE WORLD BANK</dd>
+                                                        </dl>
+                                                        <dl>
+                                                            <dt>Account number</dt>
+                                                            <dd><span id="accnum">7775877975</span> &nbsp;<button type="button" onclick="copy('#accnum')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                                                    <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                                                            </dd>
+                                                        </dl>
+                                                        <dl>
+                                                            <dt>IBAN</dt>
+                                                            <dd>CZ7775877975656</dd>
+                                                        </dl>
+                                                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -137,6 +170,12 @@
 
 @section('register-style')
 <style>
+    hr {
+        margin-top: -10px;
+        border: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
     .dropdown {
         display: none;
     }
@@ -316,6 +355,19 @@
 
 @section('register-scriptcode')
 <script>
+    function copy(selector) {
+        var $temp = $("<div>");
+        $("body").append($temp);
+        $temp.attr("contenteditable", true)
+            .html($(selector).html()).select()
+            .on("focus", function() {
+                document.execCommand('selectAll', false, null);
+            })
+            .focus();
+        document.execCommand("copy");
+        $temp.remove();
+    }
+
     $(document).ready(function() {
         $(".perkdrop1").click(function() {
             $('.dp1').slideDown();

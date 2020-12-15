@@ -25,7 +25,7 @@ Route::get('/home', 'HomeController@index')->name('home');
  * payment point url
  */
 Route::get('/checkout', 'CheckoutController@index')->name('checkout');
-Route::get('/payment-method', 'CheckoutController@paymentMethod')->name('payment-method');
+Route::post('/payment-method', 'CheckoutController@paymentMethod')->name('payment-method');
 Route::get('/getPrefixNumber', 'CheckoutController@getPrefixNumber')->name('get-prefix-number');
 Route::post('/checkout-finish', 'CheckoutController@finish')->name('checkout-finish');
 
