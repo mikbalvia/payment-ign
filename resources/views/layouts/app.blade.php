@@ -18,11 +18,29 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link rel="icon" href="{{ asset('images/ign-logo.png') }}" sizes="32x32" />
+    <style>
+        #cover-spin {
+            position: fixed;
+            width: 100%;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            z-index: 9999;
+            display: none;
+        }
+    </style>
     @yield('register-style')
 </head>
 
 <body>
     <div id="app">
+        <div id="cover-spin">
+            <div class=" spinner-grow text-danger" role="status" style="position:absolute;top:50%;left:50%;">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">

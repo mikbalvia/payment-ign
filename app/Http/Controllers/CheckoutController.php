@@ -7,6 +7,8 @@ use DB;
 use App\Http\Requests\StoreCustomerInfo;
 use Illuminate\Support\Facades\Validator;
 use App\User;
+use Midtrans\Config as PaymentConfig;
+use Midtrans\CoreApi as SendPaymentResponse;
 
 class CheckoutController extends Controller
 {
@@ -56,22 +58,58 @@ class CheckoutController extends Controller
         }
     }
 
-    public function finish(Request $request)
+    /**
+     * Processing midtrans payment
+     *
+     * @param Request $request
+     * @return json 
+     */
+    public function process(Request $request)
     {
         $payment = $request->all();
+
         if ($payment['payment-type'] === "credit-card") {
-            $validator = Validator::make($request->all(), [
-                'card-number' => ['required', 'max:19', 'numeric'],
-                'ccv'  => ['required', 'numeric', 'min:3',]
-            ]);
 
-            if ($validator->fails()) {
-                return redirect($request->server('HTTP_REFERER'))
-                    ->withErrors($validator)
-                    ->withInput();
-            }
+            $paymentResponse = $this->getPaymentResponse($payment);
+
+            return response()->json($paymentResponse);
         }
+    }
 
+    /**
+     * Get Payment response from midtrans
+     *
+     * @param array $data
+     * @return json 
+     */
+    public function getPaymentResponse($data)
+    {
+        PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
+
+        $params = array(
+            'transaction_details' => array(
+                'order_id' => rand(),
+                'gross_amount' => 400000,
+            ),
+
+            'payment_type' => 'credit_card',
+            'credit_card'  => array(
+                'token_id'      => $data['mTokenId'],
+                'authentication' => true,
+            ),
+            'customer_details' => array(
+                'first_name' => 'Budi',
+                'last_name' => 'Pratama',
+                'email' => 'budi.pra@example.com',
+                'phone' => '08111222333',
+            ),
+        );
+
+        return SendPaymentResponse::charge($params);
+    }
+
+    public function finish()
+    {
         return view('checkout.thankyou');
     }
 }

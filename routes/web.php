@@ -27,7 +27,8 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/checkout', 'CheckoutController@index')->name('checkout');
 Route::post('/payment-method', 'CheckoutController@paymentMethod')->name('payment-method');
 Route::get('/getPrefixNumber', 'CheckoutController@getPrefixNumber')->name('get-prefix-number');
-Route::post('/checkout-finish', 'CheckoutController@finish')->name('checkout-finish');
+Route::post('/checkoutProcess', 'CheckoutController@process')->name('checkout-process');
+Route::get('/checkoutFinish', 'CheckoutController@finish')->name('checkout-finish');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
 });

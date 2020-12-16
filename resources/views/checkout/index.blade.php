@@ -178,32 +178,6 @@
         display: none;
     }
 
-    /*******************************
-             States
-*******************************/
-    /* Hover */
-    .steps>*:hover,
-    .steps>*.hover {
-        background-color: #F7F7F7;
-        color: rgba(0, 0, 0, 0.8);
-    }
-
-    .steps>*.hover:after,
-    .steps>*:hover:after {
-        border-left-color: #F7F7F7;
-    }
-
-    /* Hover */
-    .steps>*.down,
-    .steps>*:active {
-        background-color: #F0F0F0;
-    }
-
-    .steps>*.down:after,
-    .steps>*:active:after {
-        border-left-color: #F0F0F0;
-    }
-
     /* Active */
     .steps>*.active {
         cursor: auto;
@@ -227,46 +201,6 @@
 
     .steps>*.now:after {
         border-left-color: #e3342f;
-
-    }
-
-    /* Done */
-    .steps>*.done {
-        cursor: auto;
-        background-color: #46b98a;
-        color: #FFFFFF;
-
-    }
-
-    .steps>*.done:after {
-        border-left-color: #46b98a;
-    }
-
-    /* Disabled */
-    .steps>*.disabled {
-        cursor: auto;
-        background-color: #FFFFFF;
-        color: #CBCBCB;
-    }
-
-    .steps>*.disabled:after {
-        border: none;
-        background-color: #FFFFFF;
-        top: 0.42em;
-        right: -1em;
-
-        width: 2.15em;
-        height: 2.15em;
-
-        -webkit-transform: rotate(-45deg);
-        -moz-transform: rotate(-45deg);
-        -o-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-
-        -webkit-box-shadow: -1px -1px 0px 0px rgba(0, 0, 0, 0.1) inset;
-        -moz-box-shadow: -1px -1px 0px 0px rgba(0, 0, 0, 0.1) inset;
-        box-shadow: -1px -1px 0px 0px rgba(0, 0, 0, 0.1) inset;
     }
 </style>
 @endsection

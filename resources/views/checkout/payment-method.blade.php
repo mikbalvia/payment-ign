@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="container">
+    @include('sweet::alert')
+    @include('checkout.modal')
     <div class="row justify-content-center">
         <div class="col-lg-12">
             <div class="card">
@@ -54,7 +56,7 @@
                             </div>
                             <div class="row my-3">
                             </div>
-                            <form method="POST" action="{{route('checkout-finish')}}" enctype="multipart/form-data">
+                            <form method="POST" action="{{route('checkout-process')}}" enctype="multipart/form-data" id="paymentForm">
                                 @csrf
                                 <div class=" row">
                                     <div class="col">
@@ -101,6 +103,7 @@
                                                                 @error('ccv')
                                                                 <span class="text-danger"><i>{{ $message }}</i></span>
                                                                 @enderror
+                                                                <input type="text" id="mToken" name="mTokenId" value="" hidden>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -145,7 +148,7 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col">
-                                        <button type="submit" id="test" class="btn btn-danger w-100">
+                                        <button type="button" id="proceedCheckout" class="btn btn-danger w-100">
                                             <h5 class="font-italic"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Checkout</h5>
                                         </button>
                                     </div>
@@ -179,182 +182,16 @@
     .dropdown {
         display: none;
     }
-
-    .steps>* {
-        display: inline-block;
-        position: relative;
-        padding: 1em 2em 1em 3em;
-
-        vertical-align: top;
-        background-color: #FFFFFF;
-        color: #888888;
-
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -ms-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-
-    .steps>*:after {
-        position: absolute;
-        z-index: 2;
-        content: '';
-        top: 0em;
-        right: -1.45em;
-
-        border-bottom: 1.5em solid transparent;
-        border-left: 1.5em solid #FFFFFF;
-        border-top: 1.5em solid transparent;
-
-        width: 0em;
-        height: 0em;
-    }
-
-
-    /*******************************
-            Group
-*******************************/
-    .steps {
-        /*font-size: 0em;*/
-        letter-spacing: -0.31em;
-        line-height: 1;
-
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        -ms-box-sizing: border-box;
-        box-sizing: border-box;
-
-        -moz-border-radius: 0.3125rem;
-        -webkit-border-radius: 0.3125rem;
-        border-radius: 0.3125rem;
-    }
-
-    .steps>* {
-        letter-spacing: normal;
-        width: 150px;
-        height: 43px; // i set the height from here
-
-    }
-
-    .steps>*:first-child {
-        padding-left: 1.35em;
-        -webkit-border-radius: 0.3125em 0em 0em 0.3125em;
-        -moz-border-radius: 0.3125em 0em 0em 0.3125em;
-        border-radius: 0.3125em 0em 0em 0.3125em;
-    }
-
-    .steps>*:last-child {
-        -webkit-border-radius: 0em 0.3125em 0.3125em 0em;
-        -moz-border-radius: 0em 0.3125em 0.3125em 0em;
-        border-radius: 0em 0.3125em 0.3125em 0em;
-        margin-right: 0;
-    }
-
-    .steps>*:only-child {
-        -webkit-border-radius: 0.3125em;
-        -moz-border-radius: 0.3125em;
-        border-radius: 0.3125em;
-    }
-
-    .steps>*:last-child:after {
-        display: none;
-    }
-
-    /*******************************
-             States
-*******************************/
-    /* Hover */
-    .steps>*:hover,
-    .steps>*.hover {
-        background-color: #F7F7F7;
-        color: rgba(0, 0, 0, 0.8);
-    }
-
-    .steps>*.hover:after,
-    .steps>*:hover:after {
-        border-left-color: #F7F7F7;
-    }
-
-    /* Hover */
-    .steps>*.down,
-    .steps>*:active {
-        background-color: #F0F0F0;
-    }
-
-    .steps>*.down:after,
-    .steps>*:active:after {
-        border-left-color: #F0F0F0;
-    }
-
-    /* Active */
-    .steps>*.active {
-        cursor: auto;
-        background-color: #e3342f;
-        width: 50%;
-        color: #FFFFFF;
-        padding: 14px 0 14px 35px;
-    }
-
-    .steps>*.active:after {
-        border-left-color: #555555;
-    }
-
-    /* Now */
-    .steps>*.now {
-        cursor: auto;
-        background-color: #e3342f2e;
-        color: #FFFFFF;
-        width: 50%;
-    }
-
-    .steps>*.now:after {
-        border-left-color: #e3342f;
-
-    }
-
-    /* Done */
-    .steps>*.done {
-        cursor: auto;
-        background-color: #46b98a;
-        color: #FFFFFF;
-
-    }
-
-    .steps>*.done:after {
-        border-left-color: #46b98a;
-    }
-
-    /* Disabled */
-    .steps>*.disabled {
-        cursor: auto;
-        background-color: #FFFFFF;
-        color: #CBCBCB;
-    }
-
-    .steps>*.disabled:after {
-        border: none;
-        background-color: #FFFFFF;
-        top: 0.42em;
-        right: -1em;
-
-        width: 2.15em;
-        height: 2.15em;
-
-        -webkit-transform: rotate(-45deg);
-        -moz-transform: rotate(-45deg);
-        -o-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-
-        -webkit-box-shadow: -1px -1px 0px 0px rgba(0, 0, 0, 0.1) inset;
-        -moz-box-shadow: -1px -1px 0px 0px rgba(0, 0, 0, 0.1) inset;
-        box-shadow: -1px -1px 0px 0px rgba(0, 0, 0, 0.1) inset;
-    }
 </style>
+<link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 @endsection
 
 @section('register-scriptcode')
+<script id="midtrans-script" type="text/javascript" src="https://api.midtrans.com/v2/assets/js/midtrans-new-3ds.min.js" data-environment="sandbox" data-client-key="{{env('MIDTRANS_CLIENT_KEY')}}"></script>
 <script>
+    /**
+     * number validation for input text
+     */
     function copy(selector) {
         var $temp = $("<div>");
         $("body").append($temp);
@@ -369,19 +206,169 @@
     }
 
     $(document).ready(function() {
+
+        /**
+         * on change payment method direct transfer
+         */
         $(".perkdrop1").click(function() {
             $('.dp1').slideDown();
             $('.dp2').slideUp();
+            $("#mnth, #yr, #ccv, #ccnum").prop('disabled', true);
         });
 
+        /**
+         * on change payment method credit card
+         */
         $(".perkdrop2").click(function() {
             $('.dp2').slideDown();
             $('.dp1').slideUp();
+            $("#mnth, #yr, #ccv, #ccnum").prop('disabled', false);
         });
 
         $("#mnth, #yr, #ccv, #ccnum").inputFilter(function(value) {
             return /^\d*$/.test(value); // Allow digits only, using a RegExp
         });
+
+        // proceed checkout form
+        $('#proceedCheckout').click(function() {
+            $('#cover-spin').show();
+
+            //payment type direct transfer
+            if ($("input[name=payment-type]:checked").val() === 'direct-transfer') {
+                $("#paymentForm").submit();
+                return true;
+            }
+
+            // card data from customer input, for example
+            var cardData = {
+                "card_number": $("#ccnum").val(),
+                "card_exp_month": $("#mnth").val(),
+                "card_exp_year": $("#yr").val(),
+                "card_cvv": $("#ccv").val(),
+            };
+
+            // callback functions
+            var options = {
+                onSuccess: function(response) {
+                    // Success to get card token_id, implement as you wish here
+                    var token_id = response.token_id;
+
+                    $('#mToken').val(token_id);
+                    getPaymentResponse();
+                },
+                onFailure: function(response) {
+                    swal({
+                        text: "Fail to get card token_id, response: " + response,
+                        title: "Error",
+                        icon: "error",
+                        buttons: "OK"
+                    });
+
+                    $('#cover-spin').hide();
+                }
+            };
+
+            // trigger `getCardToken` function
+            MidtransNew3ds.getCardToken(cardData, options);
+        });
     })
+
+    /**
+     * get midtrans payment response
+     */
+    function getPaymentResponse() {
+        var data = $('#paymentForm').serializeArray();
+        data.push({
+            name: '_token',
+            value: '<?php echo csrf_token() ?>'
+        });
+
+        $.ajax({
+            type: 'POST',
+            url: '{{route("checkout-process")}}',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                if (data.status_code === '201') {
+                    showAuthentication(data.redirect_url);
+                } else if (data.status_code === '200') {
+                    swal({
+                        text: data.status_message,
+                        title: "Payment Success",
+                        icon: "success",
+                        buttons: "OK"
+                    }).then((value) => {
+                        window.location = "{{url('/checkoutFinish')}}";
+                    });
+                } else {
+                    swal({
+                        text: data.status_message,
+                        title: "Error at processing request",
+                        icon: "error",
+                        buttons: "OK"
+                    }).then((value) => {
+                        window.location = "{{url('/checkout')}}";
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#cover-spin').hide();
+
+                swal({
+                    text: xhr.responseText,
+                    title: "Error at processing request",
+                    icon: "error",
+                    buttons: "OK"
+                })
+            }
+        });
+    }
+
+    function showAuthentication(urlRedirect) {
+        var redirect_url = urlRedirect;
+
+        // callback functions
+        var options = {
+            performAuthentication: function(redirect_url) {
+                // Implement how you will open iframe to display 3ds authentication redirect_url to customer
+                $('#cover-spin').hide();
+                $('#authView').attr('src', redirect_url);
+                $('#pinModal').modal('show');
+            },
+            onSuccess: function(response) {
+                // 3ds authentication success, implement payment success scenario
+                $('#cover-spin').hide();
+                $('#pinModal').modal('hide');
+                swal({
+                    text: response.status_message,
+                    title: "Payment Success",
+                    icon: "success",
+                    buttons: "OK"
+                }).then((value) => {
+                    window.location = "{{url('/checkoutFinish')}}";
+                });
+            },
+            onFailure: function(response) {
+                // 3ds authentication failure, implement payment failure scenario
+                $('#cover-spin').hide();
+                $('#pinModal').modal('hide');
+                swal({
+                    text: response.status_message,
+                    title: "Error at processing request",
+                    icon: "error",
+                    buttons: "OK"
+                });
+            },
+            onPending: function(response) {
+                // transaction is pending, transaction result will be notified later via POST notification, implement as you wish here
+                $('#cover-spin').hide();
+                $('#pinModal').modal('hide');
+                window.location.replace('{{url("/checkoutFinish")}}');
+            }
+        };
+
+        // trigger `authenticate` function
+        MidtransNew3ds.authenticate(redirect_url, options);
+    }
 </script>
 @endsection
