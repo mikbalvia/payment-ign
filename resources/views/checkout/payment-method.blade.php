@@ -235,7 +235,7 @@
 
             //payment type direct transfer
             if ($("input[name=payment-type]:checked").val() === 'direct-transfer') {
-                $("#paymentForm").submit();
+                getDirectTransferResponse();
                 return true;
             }
 
@@ -300,6 +300,15 @@
                     }).then((value) => {
                         window.location = "{{url('/checkoutFinish')}}";
                     });
+                } else if (data.status_code === '300') {
+                    swal({
+                        text: data.status_message,
+                        title: "Error Data",
+                        icon: "error",
+                        buttons: "OK"
+                    }).then((value) => {
+                        window.location = "{{url('/checkout')}}";
+                    });
                 } else {
                     swal({
                         text: data.status_message,
@@ -324,6 +333,7 @@
         });
     }
 
+    // 3ds Aunthentication
     function showAuthentication(urlRedirect) {
         var redirect_url = urlRedirect;
 
@@ -369,6 +379,56 @@
 
         // trigger `authenticate` function
         MidtransNew3ds.authenticate(redirect_url, options);
+    }
+
+    /**
+     * Process direct transfer payment
+     */
+    function getDirectTransferResponse() {
+        var data = $('#paymentForm').serializeArray();
+        data.push({
+            name: '_token',
+            value: '<?php echo csrf_token() ?>'
+        });
+
+        $.ajax({
+            type: 'POST',
+            url: '{{route("checkout-process")}}',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                $('#cover-spin').hide();
+                if (data.status_code === 300) {
+                    swal({
+                        text: data.status_message,
+                        title: "Error Data",
+                        icon: "error",
+                        buttons: "OK"
+                    }).then((value) => {
+                        window.location = "{{url('/checkout')}}";
+                    });
+                } else {
+                    swal({
+                        text: data.status_message,
+                        title: "Payment Success",
+                        icon: "success",
+                        buttons: "OK"
+                    }).then((value) => {
+                        window.location = "{{url('/checkoutFinish')}}";
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#cover-spin').hide();
+
+                swal({
+                    text: xhr.responseText,
+                    title: "Error at processing request",
+                    icon: "error",
+                    buttons: "OK"
+                })
+            }
+        });
     }
 </script>
 @endsection

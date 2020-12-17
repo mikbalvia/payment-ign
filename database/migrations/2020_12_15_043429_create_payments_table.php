@@ -23,6 +23,9 @@ class CreatePaymentsTable extends Migration
             $table->string('status_message')->nullable();
             $table->string('signature_key')->nullable();
             $table->string('payment_type')->nullable();
+            $table->string('bank')->nullable();
+            $table->string('currency')->nullable();
+            $table->string('transaction_id')->nullable();
             $table->timestamps();
         });
     }

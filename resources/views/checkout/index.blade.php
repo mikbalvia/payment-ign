@@ -23,7 +23,7 @@
                             </div>
                             <div class="row">
                             </div>
-                            <form method="POST" action="{{route('payment-method')}}" enctype="multipart/form-data">
+                            <form method="POST" action="{{route('store-customer')}}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-row">
                                     <div class="col">

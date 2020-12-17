@@ -25,10 +25,13 @@ Route::get('/home', 'HomeController@index')->name('home');
  * payment point url
  */
 Route::get('/checkout', 'CheckoutController@index')->name('checkout');
-Route::post('/payment-method', 'CheckoutController@paymentMethod')->name('payment-method');
+Route::post('/storeCustomerInfo', 'CheckoutController@storeCustomerInfo')->name('store-customer');
 Route::get('/getPrefixNumber', 'CheckoutController@getPrefixNumber')->name('get-prefix-number');
 Route::post('/checkoutProcess', 'CheckoutController@process')->name('checkout-process');
 Route::get('/checkoutFinish', 'CheckoutController@finish')->name('checkout-finish');
+Route::get('/payment', function () {
+    return view('checkout.payment-method');
+})->name('payment');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
 });

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\User;
 use Midtrans\Config as PaymentConfig;
 use Midtrans\CoreApi as SendPaymentResponse;
+use App\Models\Payment;
 
 class CheckoutController extends Controller
 {
@@ -23,21 +24,23 @@ class CheckoutController extends Controller
      * @param StoreCustomerInfo $request
      * @return view 
      */
-    public function paymentMethod(StoreCustomerInfo $request)
+    public function storeCustomerInfo(StoreCustomerInfo $request)
     {
         $countryCode = explode("|", $request->prefixNumber);
         $completeNumber = preg_replace('/^0?/', '+' . $countryCode[0], $request->phone);
 
-        // User::create([
-        //     'firstname' => $request->firstname,
-        //     'lastname' => $request->lastname,
-        //     'email' => $request->email,
-        //     'phone' => $completeNumber,
-        //     'country' => $countryCode[1],
-        //     'user_type' => 2
-        // ]);
+        $user = User::create([
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'email' => $request->email,
+            'phone' => $completeNumber,
+            'country' => $countryCode[1],
+            'user_type' => 2
+        ]);
 
-        return view('checkout.payment-method');
+        $cookie = cookie('piu', $user->id, 30);
+
+        return redirect('payment')->withCookie($cookie);
     }
 
     /**
@@ -67,12 +70,35 @@ class CheckoutController extends Controller
     public function process(Request $request)
     {
         $payment = $request->all();
+        $userId = $request->cookie('piu');
 
-        if ($payment['payment-type'] === "credit-card") {
+        $user = ($userId) ? User::find($userId) : "";
 
-            $paymentResponse = $this->getPaymentResponse($payment);
+        if ($user) {
+            if ($payment['payment-type'] === "credit-card") {
 
-            return response()->json($paymentResponse);
+                $paymentResponse = $this->getPaymentResponse($payment, $user);
+
+                return response()->json($paymentResponse);
+            } else {
+                $payment = Payment::create([
+                    'order_id' => rand(),
+                    'user_id' => $user->id,
+                    'amount' => 400000,
+                    'status' => 1,
+                    'payment_type' => 2
+                ]);
+
+                $data['status_code'] = 200;
+                $data['status_message'] = "Success, Direct Transfer transaction is successful";
+
+                return response()->json($data);
+            }
+        } else {
+            $data['status_code'] = 300;
+            $data['status_message'] = "User data not found, Please register your data again!";
+
+            return response()->json($data);
         }
     }
 
@@ -82,7 +108,7 @@ class CheckoutController extends Controller
      * @param array $data
      * @return json 
      */
-    public function getPaymentResponse($data)
+    public function getPaymentResponse($data, $user)
     {
         PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
 
@@ -98,10 +124,10 @@ class CheckoutController extends Controller
                 'authentication' => true,
             ),
             'customer_details' => array(
-                'first_name' => 'Budi',
-                'last_name' => 'Pratama',
-                'email' => 'budi.pra@example.com',
-                'phone' => '08111222333',
+                'first_name' => $user->firstname,
+                'last_name' => $user->lastname,
+                'email' => $user->email,
+                'phone' => $user->phone,
             ),
         );
 
