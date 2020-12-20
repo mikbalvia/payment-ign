@@ -7,8 +7,12 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-6 p-4">
-                            <img src="{{ asset('images/side-image.png') }}" class="img-fluid" alt="Responsive image">
+                        <div class="col-lg-6 p-4 mt-3">
+                            @if($product[0]['image'])
+                            <img src="<?php echo asset($product[0]['image']) ?>" class="img-fluid" alt="Responsive image" />
+                            @else
+                            <img src="<?php echo asset('/images/no-image.jpg') ?>" class="img-fluid" alt="Responsive image" />
+                            @endif
                         </div>
                         <div class="col-lg-6 pt-4">
                             <div class="row">
@@ -23,7 +27,7 @@
                             </div>
                             <div class="row">
                             </div>
-                            <form method="POST" action="{{route('store-customer')}}" enctype="multipart/form-data">
+                            <form method="POST" action="{{route('store-customer',$productId)}}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-row">
                                     <div class="col">
@@ -68,10 +72,7 @@
                                 </div>
                                 <div class=" row mt-3">
                                     <div class="col">
-                                        <p class="text-justify">*Sell Like Crazy retails for $19.95 and is a #1 international best seller on Amazon,
-                                            but today we've bought it for you! We just ask that you cover the shipping and handling costs
-                                            in order for us to send it to you. Your information is secure and will not be shared.
-                                        </p>
+                                        <p class="text-justify">{{$product[0]['desc']}}</p>
                                     </div>
                                 </div>
                             </form>
@@ -150,8 +151,7 @@
     .steps>* {
         letter-spacing: normal;
         width: 150px;
-        height: 43px; // i set the height from here
-
+        height: 43px;
     }
 
     .steps>*:first-child {

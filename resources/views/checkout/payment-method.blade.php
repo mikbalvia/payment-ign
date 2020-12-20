@@ -10,7 +10,11 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-6 p-4">
-                            <img src="{{ asset('images/side-image.png') }}" class="img-fluid" alt="Responsive image">
+                            @if($product[0]->image)
+                            <img src="<?php echo asset($product[0]->image) ?>" class="img-fluid" alt="Responsive image" />
+                            @else
+                            <img src="<?php echo asset('/images/no-image.jpg') ?>" class="img-fluid" alt="Responsive image" />
+                            @endif
                         </div>
                         <div class="col-lg-6 pt-4">
                             <div class="row">
@@ -37,10 +41,10 @@
                                     <hr>
                                     <div class="row">
                                         <div class="col">
-                                            <p class="text-left">Eurasia International MUN – Early Bird × 1</p>
+                                            <p class="text-left">{{$product[0]->name}}</p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b>Rp. 400.000</b></p>
+                                            <p class="text-right"><b>Rp. {{number_format($product[0]->price,0)}}</b></p>
                                         </div>
                                     </div>
                                     <hr>
@@ -49,7 +53,7 @@
                                             <p class="text-left"><b>Total</b></p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b>Rp. 400.000</b></p>
+                                            <p class="text-right"><b>Rp. {{number_format($product[0]->price,0)}}</b></p>
                                         </div>
                                     </div>
                                 </div>
@@ -58,6 +62,8 @@
                             </div>
                             <form method="POST" action="{{route('checkout-process')}}" enctype="multipart/form-data" id="paymentForm">
                                 @csrf
+                                <input type="hidden" value="{{$product[0]->id}}" name="productId">
+                                <input type="hidden" value="{{$product[0]->code}}" name="productCode" id="productCode">
                                 <div class=" row">
                                     <div class="col">
                                         <ul class="list-group">
@@ -155,10 +161,7 @@
                                 </div>
                                 <div class=" row mt-3">
                                     <div class="col">
-                                        <p class="text-justify">*Sell Like Crazy retails for $19.95 and is a #1 international best seller on Amazon,
-                                            but today we've bought it for you! We just ask that you cover the shipping and handling costs
-                                            in order for us to send it to you. Your information is secure and will not be shared.
-                                        </p>
+                                        <p class="text-justify">{{$product[0]->desc}}</p>
                                     </div>
                                 </div>
                             </form>
@@ -298,7 +301,7 @@
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkoutFinish')}}";
+                        window.location = "{{url('/checkoutFinish/1')}}";
                     });
                 } else if (data.status_code === '300') {
                     swal({
@@ -307,7 +310,7 @@
                         icon: "error",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkout')}}";
+                        window.location = "{{url('/checkout/step1')}}/" + $("#productCode").val();
                     });
                 } else {
                     swal({
@@ -316,7 +319,7 @@
                         icon: "error",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkout')}}";
+                        window.location = "{{url('/checkout/step1')}}/" + $("#productCode").val();
                     });
                 }
             },
@@ -355,7 +358,7 @@
                     icon: "success",
                     buttons: "OK"
                 }).then((value) => {
-                    window.location = "{{url('/checkoutFinish')}}";
+                    window.location = "{{url('/checkoutFinish/1')}}";
                 });
             },
             onFailure: function(response) {
@@ -373,7 +376,7 @@
                 // transaction is pending, transaction result will be notified later via POST notification, implement as you wish here
                 $('#cover-spin').hide();
                 $('#pinModal').modal('hide');
-                window.location.replace('{{url("/checkoutFinish")}}');
+                window.location.replace('{{url("/checkoutFinish/1")}}');
             }
         };
 
@@ -405,16 +408,16 @@
                         icon: "error",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkout')}}";
+                        window.location = "{{url('/checkout/step1')}}/" + $("#productCode").val();
                     });
                 } else {
                     swal({
                         text: data.status_message,
-                        title: "Payment Success",
+                        title: "Request Success",
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkoutFinish')}}";
+                        window.location = "{{url('/checkoutFinish/2')}}";
                     });
                 }
             },

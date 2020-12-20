@@ -10,12 +10,19 @@ use App\User;
 use Midtrans\Config as PaymentConfig;
 use Midtrans\CoreApi as SendPaymentResponse;
 use App\Models\Payment;
+use App\Models\Product;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index($id)
     {
-        return view('checkout.index');
+        $productId = $id;
+        $product = ($productId) ? Product::where('code', $productId)->get()->toArray() : "";
+        if (!count($product)) {
+            abort(404);
+        }
+
+        return view('checkout.index', compact('productId', 'product'));
     }
 
     /**
@@ -24,7 +31,7 @@ class CheckoutController extends Controller
      * @param StoreCustomerInfo $request
      * @return view 
      */
-    public function storeCustomerInfo(StoreCustomerInfo $request)
+    public function storeCustomerInfo(StoreCustomerInfo $request, $id)
     {
         $countryCode = explode("|", $request->prefixNumber);
         $completeNumber = preg_replace('/^0?/', '+' . $countryCode[0], $request->phone);
@@ -40,7 +47,7 @@ class CheckoutController extends Controller
 
         $cookie = cookie('piu', $user->id, 30);
 
-        return redirect('payment')->withCookie($cookie);
+        return redirect('checkout/step2/' . $id)->withCookie($cookie);
     }
 
     /**
@@ -73,11 +80,12 @@ class CheckoutController extends Controller
         $userId = $request->cookie('piu');
 
         $user = ($userId) ? User::find($userId) : "";
+        $product = ($payment['productId']) ? Product::find($payment['productId']) : "";
 
-        if ($user) {
+        if ($user && $product) {
             if ($payment['payment-type'] === "credit-card") {
 
-                $paymentResponse = $this->getPaymentResponse($payment, $user);
+                $paymentResponse = $this->getPaymentResponse($payment, $user, $product);
 
                 return response()->json($paymentResponse);
             } else {
@@ -85,18 +93,19 @@ class CheckoutController extends Controller
                     'order_id' => rand(),
                     'user_id' => $user->id,
                     'amount' => 400000,
-                    'status' => 1,
-                    'payment_type' => 2
+                    'status' => 2,
+                    'payment_type' => 2,
+                    'product_id' => $payment['productId']
                 ]);
 
                 $data['status_code'] = 200;
-                $data['status_message'] = "Success, Direct Transfer transaction is successful";
+                $data['status_message'] = "Success, Please complete your payment";
 
                 return response()->json($data);
             }
         } else {
             $data['status_code'] = 300;
-            $data['status_message'] = "User data not found, Please register your data again!";
+            $data['status_message'] = "User data or Product not found, Please register your data again!";
 
             return response()->json($data);
         }
@@ -108,14 +117,14 @@ class CheckoutController extends Controller
      * @param array $data
      * @return json 
      */
-    public function getPaymentResponse($data, $user)
+    public function getPaymentResponse($data, $user, $product)
     {
         PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
 
         $params = array(
             'transaction_details' => array(
                 'order_id' => rand(),
-                'gross_amount' => 400000,
+                'gross_amount' => $product->price,
             ),
 
             'payment_type' => 'credit_card',
@@ -134,8 +143,12 @@ class CheckoutController extends Controller
         return SendPaymentResponse::charge($params);
     }
 
-    public function finish()
+    public function finish($id)
     {
-        return view('checkout.thankyou');
+        if ($id == 1) {
+            return view('checkout.thankyou');
+        } else if ($id == 2) {
+            return view('checkout.thankyou-direct-transfer');
+        }
     }
 }
