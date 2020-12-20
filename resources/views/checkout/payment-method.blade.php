@@ -301,7 +301,7 @@
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkoutFinish/1')}}";
+                        window.location = "{{url('/checkout/finish/1')}}";
                     });
                 } else if (data.status_code === '300') {
                     swal({
@@ -358,7 +358,7 @@
                     icon: "success",
                     buttons: "OK"
                 }).then((value) => {
-                    window.location = "{{url('/checkoutFinish/1')}}";
+                    window.location = "{{url('/checkout/finish/1')}}";
                 });
             },
             onFailure: function(response) {
@@ -376,7 +376,7 @@
                 // transaction is pending, transaction result will be notified later via POST notification, implement as you wish here
                 $('#cover-spin').hide();
                 $('#pinModal').modal('hide');
-                window.location.replace('{{url("/checkoutFinish/1")}}');
+                window.location.replace('{{url("/checkout/finish/1")}}');
             }
         };
 
@@ -417,7 +417,7 @@
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkoutFinish/2')}}";
+                        window.location = "{{url('/checkout/finish/2')}}";
                     });
                 }
             },

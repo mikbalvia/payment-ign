@@ -5,7 +5,7 @@
  * File: ProductController.php
  * Date: 12/18/20
  * Time: 12:37 PM
- * @author: toravolta
+ * @author: muhammadikhsan
  * @copyright: IGN &copy; 2020
  */
 

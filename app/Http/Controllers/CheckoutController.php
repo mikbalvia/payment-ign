@@ -1,11 +1,19 @@
 <?php
 
+/**
+ * Project: Payment Point
+ * File: CheckoutController.php
+ * Date: 12/16/20
+ * Time: 08:37 AM
+ * @author: muhammadikhsan
+ * @copyright: IGN &copy; 2020
+ */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
 use App\Http\Requests\StoreCustomerInfo;
-use Illuminate\Support\Facades\Validator;
 use App\User;
 use Midtrans\Config as PaymentConfig;
 use Midtrans\CoreApi as SendPaymentResponse;
@@ -14,6 +22,12 @@ use App\Models\Product;
 
 class CheckoutController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  $id
+     * @return \Illuminate\Http\Response
+     */
     public function index($id)
     {
         $productId = $id;
@@ -143,6 +157,12 @@ class CheckoutController extends Controller
         return SendPaymentResponse::charge($params);
     }
 
+    /**
+     * Display a thank you page after payment success.
+     *
+     * @param  $id
+     * @return view
+     */
     public function finish($id)
     {
         if ($id == 1) {

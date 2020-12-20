@@ -31,7 +31,7 @@ Route::get('/checkout/step1/{id}', 'CheckoutController@index')->name('checkout')
 Route::post('/storeCustomerInfo/{id}', 'CheckoutController@storeCustomerInfo')->name('store-customer');
 Route::get('/getPrefixNumber', 'CheckoutController@getPrefixNumber')->name('get-prefix-number');
 Route::post('/checkoutProcess', 'CheckoutController@process')->name('checkout-process');
-Route::get('/checkoutFinish/{id}', 'CheckoutController@finish')->name('checkout-finish');
+Route::get('/checkout/finish/{id}', 'CheckoutController@finish')->name('checkout-finish');
 Route::get('/checkout/step2/{id}', function ($id = null) {
 
     $product = ($id) ? Product::where('code', $id)->get() : "";
