@@ -21,6 +21,17 @@ class Payment extends Model
      * @var array
      */
     protected $fillable = [
-        'order_id', 'user_id', 'amount', 'status', 'status_code', 'status_message', 'signature_key', 'payment_type', 'product_id'
+        'order_id',
+        'user_id',
+        'amount',
+        'status',
+        'status_code',
+        'status_message',
+        'payment_type',
+        'product_id',
+        'transaction_id',
+        'currency',
+        'transaction_status',
+        'transaction_time'
     ];
 }
