@@ -163,11 +163,11 @@ class CheckoutController extends Controller
      * @param  $id
      * @return view
      */
-    public function finish($id)
+    public function finish($id, $channel)
     {
-        if ($id == 1) {
+        if ($channel == 1) {
             return view('checkout.thankyou');
-        } else if ($id == 2) {
+        } else if ($channel == 2) {
             return view('checkout.thankyou-direct-transfer');
         }
     }
