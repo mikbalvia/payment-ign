@@ -18,7 +18,7 @@ Route::get('/', function () {
     if (Auth::check()) {
         return redirect('/product');
     } else {
-        return redirect('/checkout/step1/{id}');
+        return redirect('/home');
     }
 });
 
@@ -42,4 +42,11 @@ Route::get('/checkout/step2/{id}', function ($id = null) {
 Auth::routes();
 Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('product', 'ProductController');
+
+    /**
+     * transaction url
+     */
+    Route::get('/transaction', 'TransactionController@index')->name('transaction');
+    Route::get('/transaction/{id}/edit', 'TransactionController@edit')->name('transaction.edit');
+    Route::put('/transaction/{id}', 'TransactionController@update')->name('transaction.update');
 });

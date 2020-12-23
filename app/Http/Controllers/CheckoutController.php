@@ -102,7 +102,8 @@ class CheckoutController extends Controller
         if ($user && $product) {
             if ($payment['payment-type'] === "credit-card") {
                 $paymentResponse = $this->getPaymentResponse($payment, $user, $product, $orderId);
-                Log::info("[RESPONSE]" . json_encode($paymentResponse));
+                Log::channel('daily')->info("[RESPONSE]" . json_encode($paymentResponse));
+
                 if ($paymentResponse) {
                     $payment = Payment::create([
                         'order_id' => $orderId,
@@ -130,9 +131,10 @@ class CheckoutController extends Controller
                     'order_id' => $orderId,
                     'user_id' => $user->id,
                     'amount' => $product->price,
-                    'status' => 2,
+                    'transaction_status' => 'pending',
                     'payment_type' => 'Direct Transfer',
-                    'product_id' => $payment['productId']
+                    'product_id' => $payment['productId'],
+                    'currency' => "IDR"
                 ]);
 
                 $data['status_code'] = 200;
@@ -176,7 +178,7 @@ class CheckoutController extends Controller
             ),
         );
 
-        Log::info("[REQUEST]" . json_encode($params));
+        Log::channel('daily')->info("[REQUEST]" . json_encode($params));
         return SendPaymentResponse::charge($params);
     }
 
@@ -207,7 +209,7 @@ class CheckoutController extends Controller
         PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
         $notif = new PaymentNotification();
 
-        Log::info("[NOTIFICATION]" . json_encode($notif->getResponse()));
+        Log::channel('daily')->info("[NOTIFICATION]" . json_encode($notif->getResponse()));
 
         $transaction = $notif->transaction_status;
         $type = $notif->payment_type;

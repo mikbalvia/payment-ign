@@ -4,7 +4,10 @@
         <div class="card-body">
             <ul class="list-group">
                 <a href="{{ route('product.index') }}">
-                    <li class="list-group-item" id="product">Product</li>
+                    <li class="list-group-item" id="product"><i class="fa fa-book" aria-hidden="true"></i> &nbsp; Product</li>
+                </a>
+                <a href="{{ route('transaction') }}">
+                    <li class="list-group-item" id="transaction"><i class="fa fa-money" aria-hidden="true"></i> &nbsp; Transaction</li>
                 </a>
             </ul>
         </div>
