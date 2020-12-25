@@ -14,6 +14,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use App\Http\Requests\StoreCustomerInfo;
+use App\Jobs\SendEmailJob;
 use App\User;
 use Midtrans\Config as PaymentConfig;
 use Midtrans\CoreApi as SendPaymentResponse;
@@ -139,6 +140,8 @@ class CheckoutController extends Controller
 
                 $data['status_code'] = 200;
                 $data['status_message'] = "Success, Please complete your payment";
+
+                dispatch(new SendEmailJob($user, $product, $payment));
 
                 return response()->json($data);
             }

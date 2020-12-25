@@ -38,6 +38,9 @@ Route::get('/checkout/step2/{id}', function ($id = null) {
 
     return view('checkout.payment-method', compact('product'));
 })->name('payment');
+Route::get('/email', function () {
+    return view('emails.receipt');
+});
 
 Auth::routes();
 Route::group(['middleware' => ['auth', 'verified']], function () {
