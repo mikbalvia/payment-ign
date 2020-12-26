@@ -128,7 +128,7 @@
                 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                     <tr>
                         <td align="center" valign="top" style="padding: 20px 24px;">
-                            <a href="https://sendgrid.com" target="_blank" style="display: inline-block;">
+                            <a href="#" target="_blank" style="display: inline-block;">
                                 <img src="https://email.internationalglobalnetwork.com:4001/images/ign-logo-top.png" alt="Logo" border="0" width="48" style="display: block; width: 48px; max-width: 200px; min-width: 200px;">
                             </a>
                         </td>
@@ -236,7 +236,7 @@
                                 <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 300px;">
                                     <tr>
                                         <td align="left" valign="top" style="padding-bottom: 36px; padding-left: 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                                            <p><strong>Information</strong></p>
+                                            <p><strong>Your Info:</strong></p>
                                             <p>Name : {{$user->firstname}} {{$user->lastname}}<br> Phone : {{$user->phone}}
                                         </td>
                                     </tr>
@@ -250,7 +250,7 @@
                                 <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 300px;">
                                     <tr>
                                         <td align="left" valign="top" style="padding-bottom: 36px; padding-left: 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                                            <p><strong>Bank Account</strong></p>
+                                            <p><strong>Bank Account Transfer</strong></p>
                                             <p>Bank : Mandiri<br>Acc Number : 7775877975<br>IBAN : CZ7775877975656</p>
                                         </td>
                                     </tr>
