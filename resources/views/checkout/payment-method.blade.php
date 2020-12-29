@@ -44,7 +44,7 @@
                                             <p class="text-left">{{$product[0]->name}}</p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b>Rp. {{number_format($product[0]->price,0)}}</b></p>
+                                            <p class="text-right"><b> USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
                                         </div>
                                     </div>
                                     <hr>
@@ -53,7 +53,7 @@
                                             <p class="text-left"><b>Total</b></p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b>Rp. {{number_format($product[0]->price,0)}}</b></p>
+                                            <p class="text-right"><b>USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
                                         </div>
                                     </div>
                                 </div>

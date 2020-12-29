@@ -34,7 +34,6 @@ class SendPaymentReceipt extends Mailable
      */
     public function build()
     {
-        // return $this->view('emails.receipt');
-        return $this->subject('Payment Notification')->view('emails.receipt');
+        return $this->subject($this->user->firstname . ', Only One Step Left!')->view('emails.receipt');
     }
 }

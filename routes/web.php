@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
+use Illuminate\Http\Request;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,11 +34,17 @@ Route::post('/storeCustomerInfo/{id}', 'CheckoutController@storeCustomerInfo')->
 Route::get('/getPrefixNumber', 'CheckoutController@getPrefixNumber')->name('get-prefix-number');
 Route::post('/checkoutProcess', 'CheckoutController@process')->name('checkout-process');
 Route::get('/checkout/finish/{id}/{channel}', 'CheckoutController@finish')->name('checkout-finish');
-Route::get('/checkout/step2/{id}', function ($id = null) {
+Route::get('/checkout/step2/{id}', function ($id = null, Request $request) {
 
+    //check wheter product and user is exist
     $product = ($id) ? Product::where('code', $id)->get() : "";
+    if ($request->cookie('piu')) {
+        $user = User::find($request->cookie('piu'));
+    } else {
+        return redirect('/checkout/step1/' . $product[0]->code);
+    }
 
-    return view('checkout.payment-method', compact('product'));
+    return view('checkout.payment-method', compact('product', 'user'));
 })->name('payment');
 
 Auth::routes();

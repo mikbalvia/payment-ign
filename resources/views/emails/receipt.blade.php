@@ -195,11 +195,11 @@
                                 </tr>
                                 <tr>
                                     <td align="left" width="50%" style="padding: 6px 12px;font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">{{$product->name}}</td>
-                                    <td align="left" width="50%" style="padding: 6px 12px;font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; float: right; text-align: right;">Rp. {{number_format($product->price,0)}}</td>
+                                    <td align="left" width="50%" style="padding: 6px 12px;font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; float: right; text-align: right;">IDR {{number_format($product->price,0,',','.')}}</td>
                                 </tr>
                                 <tr>
                                     <td align="left" width="50%" style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-top: 2px dashed #D2C7BA; border-bottom: 2px dashed #D2C7BA;"><strong>Total</strong></td>
-                                    <td align="left" width="50%" style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-top: 2px dashed #D2C7BA; border-bottom: 2px dashed #D2C7BA;"><strong style="float: right;">Rp. {{number_format($product->price,0)}}</strong></td>
+                                    <td align="left" width="50%" style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-top: 2px dashed #D2C7BA; border-bottom: 2px dashed #D2C7BA;"><strong style="float: right;">IDR {{number_format($product->price,0,',','.')}}</strong></td>
                                 </tr>
                             </table>
                         </td>
