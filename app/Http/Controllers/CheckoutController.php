@@ -162,6 +162,7 @@ class CheckoutController extends Controller
     public function getPaymentResponse($data, $user, $product, $orderId)
     {
         PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
+        PaymentConfig::$isProduction = true;
 
         $params = array(
             'transaction_details' => array(
