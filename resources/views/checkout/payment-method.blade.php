@@ -489,7 +489,7 @@
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkout/finish')}}/" + $("#productCode").val() + "/2-" + value.bank;
+                        window.location = "{{url('/checkout/finish')}}/" + $("#productCode").val() + "/2-" + $('#bankToSelect').find(":selected").val();
                     });
                 }
             },
