@@ -208,7 +208,7 @@ class CheckoutController extends Controller
      */
     public function notification(Request $request)
     {
-        PaymentConfig::$isProduction = false;
+        PaymentConfig::$isProduction = true;
         PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
         $notif = new PaymentNotification();
 
