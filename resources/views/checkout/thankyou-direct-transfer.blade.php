@@ -10,20 +10,58 @@
         <div class="col mt-4">
             <h5 class="text-center">Bank account details</h5>
             <div>
-                <dl class="mt-3">
-                    <dt>Bank</dt>
-                    <dd> THE WORLD BANK</dd>
-                </dl>
-                <dl>
-                    <dt>Account number</dt>
-                    <dd><span id="accnum">7775877975</span> &nbsp;<button type="button" onclick="copy('#accnum')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
-                            <i class="fa fa-clipboard" aria-hidden="true"></i></button>
-                    </dd>
-                </dl>
-                <dl>
-                    <dt>IBAN</dt>
-                    <dd>CZ7775877975656</dd>
-                </dl>
+                @if($paymentChannel[1] == 1)
+                <div class="hide-bank" id="bank-detail-1">
+                    <dl class="mt-2">
+                        <dt>Bank</dt>
+                        <dd>Mandiri</dd>
+                    </dl>
+                    <dl>
+                        <dt>Account Name</dt>
+                        <dd>PT IGN Global Network</dd>
+                    </dl>
+                    <dl>
+                        <dt>Account number</dt>
+                        <dd><span id="accnum">1570006314489</span> &nbsp;<button type="button" onclick="copy('#accnum')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                        </dd>
+                    </dl>
+                </div>
+                @elseif($paymentChannel[1] == 2)
+                <div class="hide-bank" id="bank-detail-2">
+                    <dl class="mt-2">
+                        <dt>Bank</dt>
+                        <dd>CIMB Niaga</dd>
+                    </dl>
+                    <dl>
+                        <dt>Account Name</dt>
+                        <dd>PT IGN Global Network</dd>
+                    </dl>
+                    <dl>
+                        <dt>Account number</dt>
+                        <dd><span id="accnum2">860007012500</span> &nbsp;<button type="button" onclick="copy('#accnum2')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                        </dd>
+                    </dl>
+                </div>
+                @elseif($paymentChannel[1] == 3)
+                <div class="hide-bank" id="bank-detail-3">
+                    <dl class="mt-2">
+                        <dt>Bank</dt>
+                        <dd>Bank Central Asia (BCA)</dd>
+                    </dl>
+                    <dl>
+                        <dt>Account Name</dt>
+                        <dd>PT IGN Global Network</dd>
+                    </dl>
+                    <dl>
+                        <dt>Account number</dt>
+                        <dd><span id="accnum3">7650875529</span> &nbsp;<button type="button" onclick="copy('#accnum3')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                        </dd>
+                    </dl>
+                </div>
+                @endif
             </div>
         </div>
     </div>

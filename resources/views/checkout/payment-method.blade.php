@@ -128,24 +128,67 @@
                                                     </div>
                                                 </div>
                                                 <div class="dropdown dp1">
+                                                    <div class="row" id="select-bank">
+                                                        <div class="col ml-3">
+                                                            <div class="form-group">
+                                                                <select class="form-control" id="bankToSelect" name="bankToSelect">
+                                                                    <option value="1">Mandiri</option>
+                                                                    <option value="2">CIMB Niaga</option>
+                                                                    <option value="3">Bank Central Asia (BCA)</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div>
                                                         <h5 class="text-center">Bank account details</h5>
-                                                        <dl class="mt-2">
-                                                            <dt>Bank</dt>
-                                                            <dd> THE WORLD BANK</dd>
-                                                        </dl>
-                                                        <dl>
-                                                            <dt>Account number</dt>
-                                                            <dd><span id="accnum">7775877975</span> &nbsp;<button type="button" onclick="copy('#accnum')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
-                                                                    <i class="fa fa-clipboard" aria-hidden="true"></i></button>
-                                                            </dd>
-                                                        </dl>
-                                                        <dl>
-                                                            <dt>IBAN</dt>
-                                                            <dd>CZ7775877975656</dd>
-                                                        </dl>
-                                                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                                                        </p>
+                                                        <div class="hide-bank" id="bank-detail-1">
+                                                            <dl class="mt-2">
+                                                                <dt>Bank</dt>
+                                                                <dd>Mandiri</dd>
+                                                            </dl>
+                                                            <dl>
+                                                                <dt>Account Name</dt>
+                                                                <dd>PT IGN Global Network</dd>
+                                                            </dl>
+                                                            <dl>
+                                                                <dt>Account number</dt>
+                                                                <dd><span id="accnum">1570006314489</span> &nbsp;<button type="button" onclick="copy('#accnum')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                                                        <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                                                                </dd>
+                                                            </dl>
+                                                        </div>
+                                                        <div class="hide-bank" id="bank-detail-2">
+                                                            <dl class="mt-2">
+                                                                <dt>Bank</dt>
+                                                                <dd>CIMB Niaga</dd>
+                                                            </dl>
+                                                            <dl>
+                                                                <dt>Account Name</dt>
+                                                                <dd>PT IGN Global Network</dd>
+                                                            </dl>
+                                                            <dl>
+                                                                <dt>Account number</dt>
+                                                                <dd><span id="accnum2">860007012500</span> &nbsp;<button type="button" onclick="copy('#accnum2')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                                                        <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                                                                </dd>
+                                                            </dl>
+                                                        </div>
+                                                        <div class="hide-bank" id="bank-detail-3">
+                                                            <dl class="mt-2">
+                                                                <dt>Bank</dt>
+                                                                <dd>Bank Central Asia (BCA)</dd>
+                                                            </dl>
+                                                            <dl>
+                                                                <dt>Account Name</dt>
+                                                                <dd>PT IGN Global Network</dd>
+                                                            </dl>
+                                                            <dl>
+                                                                <dt>Account number</dt>
+                                                                <dd><span id="accnum3">7650875529</span> &nbsp;<button type="button" onclick="copy('#accnum3')" class="btn btn-outline-secondary btn-sm" data-toggle="tooltip" title="Copy to Clipboard">
+                                                                        <i class="fa fa-clipboard" aria-hidden="true"></i></button>
+                                                                </dd>
+                                                            </dl>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -185,6 +228,10 @@
     .dropdown {
         display: none;
     }
+
+    .hide-bank {
+        display: none;
+    }
 </style>
 <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 @endsection
@@ -192,6 +239,22 @@
 @section('register-scriptcode')
 <script id="midtrans-script" type="text/javascript" src="https://api.midtrans.com/v2/assets/js/midtrans-new-3ds.min.js" data-environment="production" data-client-key="{{env('MIDTRANS_CLIENT_KEY')}}"></script>
 <script>
+    function showBankDetail(val) {
+        if (val === '1') {
+            $("#bank-detail-1").show();
+            $("#bank-detail-2").hide();
+            $("#bank-detail-3").hide();
+        } else if (val === '2') {
+            $("#bank-detail-1").hide();
+            $("#bank-detail-2").show();
+            $("#bank-detail-3").hide();
+        } else {
+            $("#bank-detail-1").hide();
+            $("#bank-detail-2").hide();
+            $("#bank-detail-3").show();
+        }
+    }
+
     /**
      * number validation for input text
      */
@@ -209,6 +272,13 @@
     }
 
     $(document).ready(function() {
+        /**
+         * on select bank
+         */
+        showBankDetail("1");
+        $('#bankToSelect').on('change', function() {
+            showBankDetail(this.value);
+        });
 
         /**
          * on change payment method direct transfer
@@ -217,6 +287,7 @@
             $('.dp1').slideDown();
             $('.dp2').slideUp();
             $("#mnth, #yr, #ccv, #ccnum").prop('disabled', true);
+            $("#bankToSelect").prop('disabled', false);
         });
 
         /**
@@ -226,6 +297,7 @@
             $('.dp2').slideDown();
             $('.dp1').slideUp();
             $("#mnth, #yr, #ccv, #ccnum").prop('disabled', false);
+            $("#bankToSelect").prop('disabled', true);
         });
 
         $("#mnth, #yr, #ccv, #ccnum").inputFilter(function(value) {
@@ -417,7 +489,7 @@
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
-                        window.location = "{{url('/checkout/finish')}}/" + $("#productCode").val() + "/2";
+                        window.location = "{{url('/checkout/finish')}}/" + $("#productCode").val() + "/2-" + data.bank;
                     });
                 }
             },

@@ -248,12 +248,28 @@
               <![endif]-->
                             <div style="display: inline-block; width: 100%; max-width: 50%; min-width: 240px; vertical-align: top;">
                                 <table align="left" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 300px;">
+                                    @if($payment->bank == "Mandiri")
                                     <tr>
                                         <td align="left" valign="top" style="padding-bottom: 36px; padding-left: 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                                             <p><strong>Bank Account Transfer</strong></p>
-                                            <p>Bank : Mandiri<br>Acc Number : 7775877975<br>IBAN : CZ7775877975656</p>
+                                            <p>Bank : Mandiri<br>Acc Name : PT IGN Global Network<br>Acc Number : 1570006314489</p>
                                         </td>
                                     </tr>
+                                    @elseif($payment->bank == "CIMB")
+                                    <tr>
+                                        <td align="left" valign="top" style="padding-bottom: 36px; padding-left: 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                                            <p><strong>Bank Account Transfer</strong></p>
+                                            <p>Bank : CIMB Niaga<br>Acc Name : PT IGN Global Network<br>Acc Number : 860007012500</p>
+                                        </td>
+                                    </tr>
+                                    @elseif($payment->bank == "BCA")
+                                    <tr>
+                                        <td align="left" valign="top" style="padding-bottom: 36px; padding-left: 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                                            <p><strong>Bank Account Transfer</strong></p>
+                                            <p>Bank : BCA<br>Acc Name : PT IGN Global Network<br>Acc Number : 7650875529</p>
+                                        </td>
+                                    </tr>
+                                    @endif
                                 </table>
                             </div>
                             <!--[if (gte mso 9)|(IE)]>

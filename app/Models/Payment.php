@@ -32,6 +32,7 @@ class Payment extends Model
         'transaction_id',
         'currency',
         'transaction_status',
-        'transaction_time'
+        'transaction_time',
+        'bank'
     ];
 }

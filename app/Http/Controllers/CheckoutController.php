@@ -99,6 +99,7 @@ class CheckoutController extends Controller
         $user = ($userId) ? User::find($userId) : "";
         $product = ($payment['productId']) ? Product::find($payment['productId']) : "";
         $orderId = "ign-" . time() . mt_rand() . "-" . $user->id . "-" . $product->id;
+        $bank = [1 => 'Mandiri', 2 => 'CIMB', 3 => 'BCA'];
 
         if ($user && $product) {
             if ($payment['payment-type'] === "credit-card") {
@@ -135,11 +136,13 @@ class CheckoutController extends Controller
                     'transaction_status' => 'pending',
                     'payment_type' => 'Direct Transfer',
                     'product_id' => $payment['productId'],
-                    'currency' => "IDR"
+                    'currency' => "IDR",
+                    'bank' => $bank[$payment['bankToSelect']]
                 ]);
 
                 $data['status_code'] = 200;
                 $data['status_message'] = "Success, Please complete your payment";
+                $data['bank'] = $payment['bankToSelect'];
 
                 dispatch(new SendEmailJob($user, $product, $payment));
 
@@ -194,10 +197,11 @@ class CheckoutController extends Controller
      */
     public function finish($id, $channel)
     {
-        if ($channel == 1) {
+        $paymentChannel = explode("-", $channel);
+        if ($paymentChannel[0] == 1) {
             return view('checkout.thankyou');
         } else if ($channel == 2) {
-            return view('checkout.thankyou-direct-transfer');
+            return view('checkout.thankyou-direct-transfer', compact('paymentChannel'));
         }
     }
 
@@ -276,6 +280,7 @@ class CheckoutController extends Controller
         $payment->status_message = $response->status_message;
         $payment->transaction_status = $response->transaction_status;
         $payment->transaction_time = $response->transaction_time;
+        $payment->bank = $response->bank;
         $payment->save();
     }
 }
