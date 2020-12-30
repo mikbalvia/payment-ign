@@ -190,7 +190,7 @@
 @endsection
 
 @section('register-scriptcode')
-<script id="midtrans-script" type="text/javascript" src="https://api.midtrans.com/v2/assets/js/midtrans-new-3ds.min.js" data-environment="sandbox" data-client-key="{{env('MIDTRANS_CLIENT_KEY')}}"></script>
+<script id="midtrans-script" type="text/javascript" src="https://api.midtrans.com/v2/assets/js/midtrans-new-3ds.min.js" data-environment="production" data-client-key="{{env('MIDTRANS_CLIENT_KEY')}}"></script>
 <script>
     /**
      * number validation for input text
