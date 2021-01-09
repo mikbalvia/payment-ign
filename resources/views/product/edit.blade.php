@@ -44,6 +44,13 @@
                     @enderror
                 </div>
                 <div class="form-group">
+                    <label for="productPrice">Term & Condition URL</label>
+                    <input type="text" class="form-control" id="tncUrl" name="tnc_url" value="{{ old('tnc_url', $product->tnc_url) }}">
+                    @error('tnc_url')
+                    <span class="text-danger"><i>{{ $message }}</i></span>
+                    @enderror
+                </div>
+                <div class="form-group">
                     <label for="productDesc">Desc</label>
                     <textarea class="form-control" id="productDesc" rows="3" name="desc">{{$product->desc}}</textarea>
                 </div>

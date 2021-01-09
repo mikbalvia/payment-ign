@@ -21,6 +21,7 @@ class CreateProductsTable extends Migration
             $table->bigInteger('price');
             $table->string('image')->nullable();
             $table->string('endpoint')->nullable();
+            $table->string('tnc_url')->nullable();
             $table->timestamps();
         });
     }

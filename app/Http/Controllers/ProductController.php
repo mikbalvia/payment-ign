@@ -89,6 +89,7 @@ class ProductController extends Controller
             'image' => $url,
             'code' => Str::upper($request->code),
             'price' => $request->price,
+            'tnc_url' => $request->tnc_url,
             'desc' => $request->desc,
             'endpoint' => url("/checkout/step1/" . Str::upper($request->code))
         ]);
@@ -175,6 +176,7 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->image = $url;
         $product->price = $request->price;
+        $product->pricetnc_url = $request->tnc_url;
         $product->desc = $request->desc;
         $product->endpoint = url("/checkout/step1/" . Str::upper($request->code));
         $product->save();

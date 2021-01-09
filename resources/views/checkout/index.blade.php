@@ -63,9 +63,17 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <div class="form-check mt-3">
+                                    <div class="col">
+                                        <input class="form-check-input" type="checkbox" value="" id="tncCheck">
+                                        <label class="form-check-label" for="defaultCheck1">
+                                            <p>Check here to indicate that you have read and agree to the <a target="_blank" rel="noopener noreferrer" href="{{$product[0]['tnc_url']}}">Term and Conditions</a></p>
+                                        </label>
+                                    </div>
+                                </div>
                                 <div class="row mt-3">
                                     <div class="col">
-                                        <button type="submit" class="btn btn-danger w-100">
+                                        <button type="submit" class="btn btn-danger w-100" disabled id="btnSbmit">
                                             <h5 class="font-italic pt-1"><i class="fa fa-angle-double-right" aria-hidden="true"></i> Next Step</h5>
                                         </button>
                                     </div>
@@ -231,6 +239,14 @@
 
         $("#phne").inputFilter(function(value) {
             return /^\d*$/.test(value); // Allow digits only, using a RegExp
+        });
+
+        $('#tncCheck').change(function() {
+            if (this.checked) {
+                $("#btnSbmit").prop('disabled', false);
+            } else {
+                $("#btnSbmit").prop('disabled', true);
+            }
         });
     })
 </script>
