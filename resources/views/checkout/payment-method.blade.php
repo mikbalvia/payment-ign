@@ -56,6 +56,12 @@
                                             <p class="text-right"><b>USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
                                         </div>
                                     </div>
+                                    <div class=" row mt-3">
+                                        <div class="col">
+                                            <h5>Description :</h5>
+                                            <p class="text-justify">{{$product[0]->desc}}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="row my-3">
@@ -200,11 +206,6 @@
                                         <button type="button" id="proceedCheckout" class="btn btn-danger w-100">
                                             <h5 class="font-italic"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Checkout</h5>
                                         </button>
-                                    </div>
-                                </div>
-                                <div class=" row mt-3">
-                                    <div class="col">
-                                        <p class="text-justify">{{$product[0]->desc}}</p>
                                     </div>
                                 </div>
                             </form>

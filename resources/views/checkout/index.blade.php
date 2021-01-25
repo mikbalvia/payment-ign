@@ -78,11 +78,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class=" row mt-3">
-                                    <div class="col">
-                                        <p class="text-justify">{{$product[0]['desc']}}</p>
-                                    </div>
-                                </div>
                             </form>
                         </div>
                     </div>
