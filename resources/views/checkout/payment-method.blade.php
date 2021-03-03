@@ -38,6 +38,7 @@
                                             <p class="text-right"><b>Subtotal</b></p>
                                         </div>
                                     </div>
+                                    
                                     <hr>
                                     <div class="row">
                                         <div class="col">
@@ -47,13 +48,25 @@
                                             <p class="text-right"><b> USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
                                         </div>
                                     </div>
+                                    @foreach ($product[0]->additionalProduct as $item)
+                                    <div class="row table-additional" id="table-additional-{{$item->id}}">
+                                        <div class="col">
+                                            <p class="text-left">{{$item->name}}</p>
+                                        </div>
+                                        <div class="col">
+                                            <p class="text-right"><b> USD {{number_format($item->price / env('USD_RATE'),0)}} / IDR {{number_format($item->price,0,',','.')}}</b></p>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                    
                                     <hr>
+                                    
                                     <div class="row">
                                         <div class="col">
                                             <p class="text-left"><b>Total</b></p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b>USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
+                                            <p class="text-right font-weight-bold" id="total" data-total-usd="{{number_format($product[0]->price / env('USD_RATE'),0)}}" data-total-idr="{{number_format($product[0]->price,0,',','.')}}">USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</p>
                                         </div>
                                     </div>
                                     <div class=" row mt-3">
@@ -64,8 +77,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row my-3">
+                            @foreach ($product[0]->additionalProduct as $item)
+                            
+                            <div class="row p-3">
+                                <div class="col card p-2" style="flex-direction: row">
+                                    <div class="col-md-4">
+                                        <img src="<?php echo asset($item->image) ?>" alt="" width="100%">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="font-weight-bold">{{$item->name}}</p>
+                                        <p class="font-weight-bold">USD {{number_format($item->price / env('USD_RATE'),0)}} / IDR {{number_format($item->price,0,',','.')}}</p>
+                                        <p>{{$item->desc}}</p>
+                                        <button type="button" class="btn btn-info w-90 add-rem-item" data-process='add' data-add-rem-item-id="{{$item->id}}" data-add-rem-item-price-usd="{{number_format($item->price / env('USD_RATE'),0)}}" data-add-rem-item-price-idr="{{number_format($item->price,0,',','.')}}">
+                                            <p style="color: white;margin:0"><i class="fa fa-plus" aria-hidden="true"></i> Add</p>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                                
+                            @endforeach
                             <form method="POST" action="{{route('checkout-process')}}" enctype="multipart/form-data" id="paymentForm">
                                 @csrf
                                 <input type="hidden" value="{{$product[0]->id}}" name="productId">
@@ -240,6 +270,7 @@
 @section('register-scriptcode')
 <script id="midtrans-script" type="text/javascript" src="https://api.midtrans.com/v2/assets/js/midtrans-new-3ds.min.js" data-environment="production" data-client-key="{{env('MIDTRANS_CLIENT_KEY')}}"></script>
 <script>
+
     function showBankDetail(val) {
         if (val === '1') {
             $("#bank-detail-1").show();
@@ -273,6 +304,38 @@
     }
 
     $(document).ready(function() {
+        
+        /**
+        * on click button add remove
+        */
+        $('.add-rem-item').on('click',function(){
+            if ($(this).attr('data-process')=='add') {
+                var totalUSD=parseInt($('#total').attr('data-total-usd'))+parseInt($(this).attr('data-add-rem-item-price-usd'));
+                var totalIDR=parseInt($('#total').attr('data-total-idr'))+parseInt($(this).attr('data-add-rem-item-price-idr'));
+                $(this).removeClass('btn-info').addClass('btn-danger');
+                $(this).find('p').empty().append('<i class="fa fa-minus" aria-hidden="true"></i> Remove');
+                $(this).attr('data-process','remove');
+                $('#table-additional-'+$(this).attr('data-add-rem-item-id')).show();
+                $('form').prepend('<input type="hidden" value="'+$(this).attr('data-add-rem-item-id')+'" name="addItem[]" id="input-add-item-'+$(this).attr('data-add-rem-item-id')+'">');
+            }
+            else{
+                var totalUSD=parseInt($('#total').attr('data-total-usd'))-parseInt($(this).attr('data-add-rem-item-price-usd'));
+                var totalIDR=parseInt($('#total').attr('data-total-idr'))-parseInt($(this).attr('data-add-rem-item-price-idr'));
+                $(this).removeClass('btn-danger').addClass('btn-info');
+                $(this).find('p').empty().append('<i class="fa fa-plus" aria-hidden="true"></i> Add');
+                $(this).attr('data-process','add');
+                $('#table-additional-'+$(this).attr('data-add-rem-item-id')).hide();
+                $('#input-add-item-'+$(this).attr('data-add-rem-item-id')).remove();
+            }
+            $('#total').empty().append('USD  '+totalUSD+' / IDR '+totalIDR);
+            $('#total').attr('data-total-usd',totalUSD);
+            $('#total').attr('data-total-idr',totalIDR);
+            
+        })
+        /**
+         * hide table price additional product
+         */
+        $('.table-additional').hide();
         /**
          * on select bank
          */
