@@ -37,7 +37,7 @@ Route::get('/checkout/finish/{id}/{channel}', 'CheckoutController@finish')->name
 Route::get('/checkout/step2/{id}', function ($id = null, Request $request) {
 
     //check wheter product and user is exist
-    $product = ($id) ? Product::where('code', $id)->get() : "";
+    $product = ($id) ? Product::where('code', $id)->with('additionalProduct')->get() : "";
     if ($request->cookie('piu')) {
         $user = User::find($request->cookie('piu'));
     } else {
@@ -50,6 +50,10 @@ Route::get('/checkout/step2/{id}', function ($id = null, Request $request) {
 Auth::routes();
 Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('product', 'ProductController');
+    Route::resource('additional-product', 'AdditionalProductController');
+    Route::get('/additional-product/{id}/create', 'AdditionalProductController@create');
+    Route::get('/additional-product/product/{product_id}', 'AdditionalProductController@index');
+    
 
     /**
      * transaction url
