@@ -21,6 +21,8 @@ use Midtrans\CoreApi as SendPaymentResponse;
 use Midtrans\Notification as PaymentNotification;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\AdditionalProduct;
+use App\Models\PaymentAdditionalProduct;
 use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
@@ -95,22 +97,30 @@ class CheckoutController extends Controller
     {
         $payment = $request->all();
         $userId = $request->cookie('piu');
-
         $user = ($userId) ? User::find($userId) : "";
         $product = ($payment['productId']) ? Product::find($payment['productId']) : "";
         $orderId = "ign-" . time() . mt_rand() . "-" . $user->id . "-" . $product->id;
         $bank = [1 => 'Mandiri', 2 => 'CIMB', 3 => 'BCA'];
 
         if ($user && $product) {
+            $amount=$product->price;
+            if (isset($payment['addItem'])) {
+                foreach ($payment['addItem'] as $key => $value) {
+                    $item=AdditionalProduct::find($value);
+                    $amount=$amount+$item->price;
+                }
+            }
+            
+
             if ($payment['payment-type'] === "credit-card") {
-                $paymentResponse = $this->getPaymentResponse($payment, $user, $product, $orderId);
+                $paymentResponse = $this->getPaymentResponse($payment, $user, $product, $orderId,$amount);
                 Log::channel('daily')->info("[RESPONSE]" . json_encode($paymentResponse));
 
                 if ($paymentResponse) {
                     $payment = Payment::create([
                         'order_id' => $orderId,
                         'user_id' => $user->id,
-                        'amount' => $product->price,
+                        'amount' => $amount,
                         'payment_type' => 'Credit Card',
                         'product_id' => $payment['productId'],
                         'transaction_id' => $paymentResponse->transaction_id,
@@ -120,6 +130,17 @@ class CheckoutController extends Controller
                         'transaction_time' => $paymentResponse->transaction_time,
                         'currency' => $paymentResponse->currency
                     ]);
+
+                    if (isset($request['addItem'])) {
+                        foreach ($request['addItem'] as $key => $value) {
+                            $paymentAdditionalProduct = PaymentAdditionalProduct::create([
+                                'payment_id' => $payment->id,
+                                'additional_product_id' => $value,
+                            ]);
+                            
+                        }
+                    }
+
                 } else {
                     $data['status_code'] = 300;
                     $data['status_message'] = "Error processing payment";
@@ -129,17 +150,26 @@ class CheckoutController extends Controller
 
                 return response()->json($paymentResponse);
             } else {
+                
                 $payment = Payment::create([
                     'order_id' => $orderId,
                     'user_id' => $user->id,
-                    'amount' => $product->price,
+                    'amount' => $amount,
                     'transaction_status' => 'pending',
                     'payment_type' => 'Direct Transfer',
                     'product_id' => $payment['productId'],
                     'currency' => "IDR",
                     'bank' => $bank[$payment['bankToSelect']]
                 ]);
-
+                if (isset($request['addItem'])) {
+                    foreach ($request['addItem'] as $key => $value) {
+                        $paymentAdditionalProduct = PaymentAdditionalProduct::create([
+                            'payment_id' => $payment->id,
+                            'additional_product_id' => $value,
+                        ]);
+                        
+                    }
+                }
                 $data['status_code'] = 200;
                 $data['status_message'] = "Success, Please complete your payment";
                 $data['bank'] = $payment['bankToSelect'];
@@ -162,7 +192,7 @@ class CheckoutController extends Controller
      * @param array $data
      * @return json 
      */
-    public function getPaymentResponse($data, $user, $product, $orderId)
+    public function getPaymentResponse($data, $user, $product, $orderId, $amount)
     {
         PaymentConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
         PaymentConfig::$isProduction = true;
@@ -170,7 +200,7 @@ class CheckoutController extends Controller
         $params = array(
             'transaction_details' => array(
                 'order_id' => $orderId,
-                'gross_amount' => $product->price,
+                'gross_amount' => $amount,
             ),
             'payment_type' => 'credit_card',
             'credit_card'  => array(

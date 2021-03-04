@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class AdditionalProduct extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,11 +12,11 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'desc', 'image', 'price', 'endpoint', 'code', 'tnc_url'
+        'product_id','name', 'desc', 'image', 'price'
     ];
 
-    public function additionalProduct()
+    public function product()
     {
-        return $this->hasMany('App\Models\AdditionalProduct');
+        return $this->belongTo('App\Models\Product');
     }
 }

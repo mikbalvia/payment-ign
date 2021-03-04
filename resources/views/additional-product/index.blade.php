@@ -6,29 +6,18 @@
 
 <div class="col-md-9 my-2">
     <div class="card">
-        <div class="card-header">{{ __('Product') }}</div>
+        <div class="card-header">{{ __('Additional Product') }}</div>
         @include('layouts.flash-message')
         <div class="card-body">
-            <div class="pull-right mb-2"><a href="{{ route('product.create') }}" class="btn btn-success"><i class="fa fa-plus-circle"></i> Create Product</a></div>
-            <table class="table table-bordered table-responsive">
-                <colgroup>
-                    <col span="1" style="width: 5%;">
-                    <col span="1" style="width: 20%;">
-                    <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 10%;">
-                    <col span="1" style="width: 15%;">
-                    <col span="1" style="width: 25%;">
-                    <col span="1" style="width: 10%;">
-                </colgroup>
+            <div class="pull-right mb-2"><a href="{{ url('additional-product/'.Request::segment(3).'/create') }}" class="btn btn-success"><i class="fa fa-plus-circle"></i> Create Additional Product</a></div>
+            <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">Product Name</th>
-                        <th scope="col">Product Code</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Endpoint</th>
-                        <th scope="col">Action</th>
+                        <th>#</th>
+                        <th>Image</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,17 +32,14 @@
                             @endif
                         </td>
                         <td>{{$product->name}}</td>
-                        <td>{{Str::upper($product->code)}}</td>
                         <td>Rp. {{number_format($product->price,0)}}</td>
-                        <td>{{$product->endpoint}}</td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a class="btn btn-primary btn-sm mr-1" href="{{ url('product/'.$product->id.'/edit') }}">Edit</a>
+                                <a class="btn btn-primary btn-sm mr-1" href="{{ url('additional-product/'.$product->id.'/edit') }}">Edit</a>
                                 <button type="button" onClick="handleDelete({{$product->id}})" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">
                                     Delete
                                 </button>
                             </div>
-                            <a class="btn btn-warning btn-sm mt-2" style="width: 100%;color:white" href="{{ url('additional-product/product/'.$product->id) }}">Addtional</a>
                         </td>
                     </tr>
                     @endforeach
@@ -79,7 +65,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <form action="{{ route('product.destroy', 'id') }}" method="post">
+                <form action="{{ route('additional-product.destroy', 'id') }}" method="post">
                     @csrf
                     @method('DELETE')
                     <input id="id" name="id" hidden />
