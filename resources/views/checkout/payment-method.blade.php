@@ -40,21 +40,40 @@
                                     </div>
                                     
                                     <hr>
+
+                                    @if ($product[0]->price)
                                     <div class="row">
                                         <div class="col">
                                             <p class="text-left">{{$product[0]->name}}</p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b> USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
+                                            <p class="text-right"><b> USD {{number_format($product[0]->price / env('USD_RATE'),2)}} / IDR {{number_format($product[0]->price,0,',','.')}}</b></p>
                                         </div>
                                     </div>
+                                        
+                                    @endif
+                                    
                                     @foreach ($product[0]->additionalProduct as $item)
+                                    @php
+                                        $qty=1;
+                                        if (isset($cart)) {
+                                            foreach($cart as $value){
+                                                if($value->id==$item->id){
+                                                $qty=$value->qty; 
+                                                break;
+                                                }else{
+                                                    $qty=1;
+                                                }
+                                            }
+                                        }
+
+                                    @endphp
                                     <div class="row table-additional" id="table-additional-{{$item->id}}">
                                         <div class="col">
                                             <p class="text-left">{{$item->name}}</p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right"><b> USD {{number_format($item->price / env('USD_RATE'),0)}} / IDR {{number_format($item->price,0,',','.')}}</b></p>
+                                            <b><p class="text-right subtotal-add" data-id="{{$item->id}}" data-price="{{$item->price}}">USD {{number_format($item->price / env('USD_RATE'),2)}} / IDR {{number_format($item->price*$qty,0,',','.')}}</p></b>
                                         </div>
                                     </div>
                                     @endforeach
@@ -66,7 +85,7 @@
                                             <p class="text-left"><b>Total</b></p>
                                         </div>
                                         <div class="col">
-                                            <p class="text-right font-weight-bold" id="total" data-total-usd="{{number_format($product[0]->price / env('USD_RATE'),0)}}" data-total-idr="{{number_format($product[0]->price,0,',','.')}}">USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</p>
+                                            <p class="text-right font-weight-bold" id="total">USD {{number_format($product[0]->price / env('USD_RATE'),0)}} / IDR {{number_format($product[0]->price,0,',','.')}}</p>
                                         </div>
                                     </div>
                                     <div class=" row mt-3">
@@ -77,7 +96,25 @@
                                     </div>
                                 </div>
                             </div>
+                            <form id="paymentForm" enctype="multipart/form-data">
+                                @csrf
+
                             @foreach ($product[0]->additionalProduct as $item)
+
+                            @php
+                                $qty=1;
+                                if (isset($cart)) {
+                                    foreach($cart as $value){
+                                        if($value->id==$item->id){
+                                        $qty=$value->qty; 
+                                        break;
+                                        }else{
+                                            $qty=1;
+                                        }
+                                    }
+                                }
+
+                            @endphp
                             
                             <div class="row p-3">
                                 <div class="col card p-2" style="flex-direction: row">
@@ -86,9 +123,20 @@
                                     </div>
                                     <div class="col-md-6">
                                         <p class="font-weight-bold">{{$item->name}}</p>
-                                        <p class="font-weight-bold">USD {{number_format($item->price / env('USD_RATE'),0)}} / IDR {{number_format($item->price,0,',','.')}}</p>
+                                        <p class="font-weight-bold">USD {{number_format($item->price / env('USD_RATE'),2)}} / IDR {{number_format($item->price,0,',','.')}}</p>
                                         <p>{{$item->desc}}</p>
-                                        <button type="button" class="btn btn-info w-90 add-rem-item" data-process='add' data-add-rem-item-id="{{$item->id}}" data-add-rem-item-price-usd="{{number_format($item->price / env('USD_RATE'),0)}}" data-add-rem-item-price-idr="{{number_format($item->price,0,',','.')}}">
+
+                                        <div class="form-group" id="qty-additional-{{$item->id}}" style="display: none">
+                                            <div class="d-flex">
+                                                <label style="margin-right:10px"><span>Qty</span></label>
+                                                <div class="input-group">
+                                                    <input type="number" class="inp-qty" name="qty-f" min="1" value="{{$qty}}" id="inp-qty-add-{{$item->id}}" data-id="{{$item->id}}" data-price="{{$item->price}}" required style="width:50px">
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+
+                                        <button id="add-rem-item-{{$item->id}}" type="button" class="btn btn-info w-90 add-rem-item" data-process='add' data-add-rem-item-id="{{$item->id}}" data-add-rem-item-price-usd="{{number_format($item->price / env('USD_RATE'),0)}}" data-add-rem-item-price-idr="{{number_format($item->price,0,',','.')}}">
                                             <p style="color: white;margin:0"><i class="fa fa-plus" aria-hidden="true"></i> Add</p>
                                         </button>
                                     </div>
@@ -96,14 +144,13 @@
                             </div>
                                 
                             @endforeach
-                            <form method="POST" action="{{route('checkout-process')}}" enctype="multipart/form-data" id="paymentForm">
-                                @csrf
+                            
                                 <input type="hidden" value="{{$product[0]->id}}" name="productId">
                                 <input type="hidden" value="{{$product[0]->code}}" name="productCode" id="productCode">
                                 <div class=" row">
                                     <div class="col">
                                         <ul class="list-group">
-                                            <li class="list-group-item">
+                                            {{-- <li class="list-group-item">
                                                 <div class="row el">
                                                     <div class="col ml-3">
                                                         <input class="form-check-input perkdrop2" type="radio" name="payment-type" value="credit-card">
@@ -150,7 +197,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </li>
+                                            </li> --}}
                                             <li class="list-group-item">
                                                 <div class="row el">
                                                     <div class="col ml-3">
@@ -228,12 +275,56 @@
                                                     </div>
                                                 </div>
                                             </li>
+                                            <li class="list-group-item">
+                                                <div class="row el">
+                                                    <div class="col md-3 ml-3">
+                                                        <input class="form-check-input perkdrop3" type="radio" name="payment-type" value="wallet">
+                                                        <label class="form-check-label" for="gridRadios1"><i class="fa fa-google-wallet" aria-hidden="true"></i> E-Wallet</label>
+                                                        <img src="https://pay.internationalglobalnetwork.com/wp-content/plugins/nicepay_ewalletv2/e_wallet.png" class="img-fluid my-2" style="margin: 0px !important;">
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown dp3 mt-2">
+                                                    <div class="row" id="select-wallet">
+                                                        <div class="col ml-3">
+                                                            <div class="form-group">
+                                                                <select class="form-control" id="walletToSelect" name="walletToSelect">
+                                                                    <option value="OVOE">OVO</option>
+                                                                    <option value="DANA">DANA</option>
+                                                                    <option value="LINK">LINK</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label><span>Wallet Number</span></label>
+                                                                <div class="input-group">
+                                                                    
+                                                                    <input type="text" name="wallet-number" maxlength="19" placeholder="082-1234-xxxx" id="walletnum" class="form-control" required>
+                                                                    
+                                                                    @error('card-number')
+                                                                    <span class="text-danger"><i>{{ $message }}</i></span>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </li>
+                                            {{-- <li class="list-group-item">
+                                                <div class="row el">
+                                                    <div class="col md-3 ml-3">
+                                                        <input class="form-check-input perkdrop4" type="radio" name="payment-type" value="qris">
+                                                        <label class="form-check-label" for="gridRadios1"><i class="fa fa-qrcode" aria-hidden="true"></i> QRIS</label>
+                                                        <img src="https://pay.internationalglobalnetwork.com/wp-content/plugins/nicepay_qrisv2/qrislogo1.png" class="img-fluid my-2" style="margin: 0px !important;">
+                                                    </div>
+                                                </div>
+                                                
+                                            </li> --}}
                                         </ul>
                                     </div>
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col">
-                                        <button type="button" id="proceedCheckout" class="btn btn-danger w-100">
+                                        <button type="submit" id="proceedCheckout" class="btn btn-danger w-100">
                                             <h5 class="font-italic"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Checkout</h5>
                                         </button>
                                     </div>
@@ -303,15 +394,40 @@
         $temp.remove();
     }
 
+    /**
+     * get total payment
+     */
+    function total() {
+        var usdRate= {{env('USD_RATE')}};
+        var totalPrice = <?= $product[0]->price; ?>;
+        $('.inp-qty').each(function() {
+            if ($(this).attr('name')=='qty[]') {
+                totalPrice = parseInt(totalPrice) + (parseInt($(this).attr('data-price'))* parseInt($(this).val())) ;
+                var price = $(this).attr('data-price');
+                var qty = $(this).val();
+                var usd = parseInt(price)*parseInt(qty)/usdRate;
+                var idr = parseInt(price)*parseInt(qty);
+                price = 'USD '+usd.toFixed(2)+' / IDR '+idr.toFixed(2);
+                $('.subtotal-add[data-id="'+$(this).attr('data-id')+'"]').empty().append(price);   
+            }
+            
+        });
+
+        var usd = parseInt(totalPrice)/usdRate;
+        var idr = parseInt(totalPrice);
+        var pTotal = 'USD '+usd.toFixed(2)+' / IDR '+idr.toFixed(2);
+        $('#total').empty().append(pTotal);
+    }
+
     $(document).ready(function() {
-        
+
         /**
         * on click button add remove
         */
         $('.add-rem-item').on('click',function(){
             if ($(this).attr('data-process')=='add') {
-                var totalUSD=parseInt($('#total').attr('data-total-usd'))+parseInt($(this).attr('data-add-rem-item-price-usd'));
-                var totalIDR=parseInt($('#total').attr('data-total-idr'))+parseInt($(this).attr('data-add-rem-item-price-idr'));
+                $('#qty-additional-'+$(this).attr('data-add-rem-item-id')).show();
+                $('#inp-qty-add-'+$(this).attr('data-add-rem-item-id')).attr('name','qty[]');
                 $(this).removeClass('btn-info').addClass('btn-danger');
                 $(this).find('p').empty().append('<i class="fa fa-minus" aria-hidden="true"></i> Remove');
                 $(this).attr('data-process','remove');
@@ -319,19 +435,41 @@
                 $('form').prepend('<input type="hidden" value="'+$(this).attr('data-add-rem-item-id')+'" name="addItem[]" id="input-add-item-'+$(this).attr('data-add-rem-item-id')+'">');
             }
             else{
-                var totalUSD=parseInt($('#total').attr('data-total-usd'))-parseInt($(this).attr('data-add-rem-item-price-usd'));
-                var totalIDR=parseInt($('#total').attr('data-total-idr'))-parseInt($(this).attr('data-add-rem-item-price-idr'));
+                $('#qty-additional-'+$(this).attr('data-add-rem-item-id')).hide();
+                $('#inp-qty-add-'+$(this).attr('data-add-rem-item-id')).attr('name','qty-f');
                 $(this).removeClass('btn-danger').addClass('btn-info');
                 $(this).find('p').empty().append('<i class="fa fa-plus" aria-hidden="true"></i> Add');
                 $(this).attr('data-process','add');
                 $('#table-additional-'+$(this).attr('data-add-rem-item-id')).hide();
                 $('#input-add-item-'+$(this).attr('data-add-rem-item-id')).remove();
             }
-            $('#total').empty().append('USD  '+totalUSD+' / IDR '+totalIDR);
-            $('#total').attr('data-total-usd',totalUSD);
-            $('#total').attr('data-total-idr',totalIDR);
+            total();
             
         })
+        
+        /**
+        * check session cart
+        */
+        setTimeout(function(){ 
+            @php
+            if (isset($cart)) {
+                foreach ($cart as $key => $value) {
+                    echo "$('#add-rem-item-".$value->id."').click();";
+                }
+                
+            }
+                
+            @endphp
+        }, 1000);
+
+        /**
+        * change quantity product
+        */
+        $('.inp-qty').on('change',function() {
+            total()    
+        })
+
+
         /**
          * hide table price additional product
          */
@@ -350,8 +488,10 @@
         $(".perkdrop1").click(function() {
             $('.dp1').slideDown();
             $('.dp2').slideUp();
+            $('.dp3').slideUp();
             $("#mnth, #yr, #ccv, #ccnum").prop('disabled', true);
             $("#bankToSelect").prop('disabled', false);
+            $("#walletToSelect, #walletnum").prop('disabled', true);
         });
 
         /**
@@ -360,8 +500,28 @@
         $(".perkdrop2").click(function() {
             $('.dp2').slideDown();
             $('.dp1').slideUp();
+            $('.dp3').slideUp();
             $("#mnth, #yr, #ccv, #ccnum").prop('disabled', false);
             $("#bankToSelect").prop('disabled', true);
+            $("#walletToSelect, #walletnum").prop('disabled', true);
+        });
+
+        $(".perkdrop3").click(function() {
+            $('.dp1').slideUp();
+            $('.dp2').slideUp();
+            $('.dp3').slideDown();
+            $("#mnth, #yr, #ccv, #ccnum").prop('disabled', true);
+            $("#bankToSelect").prop('disabled', true);
+            $("#walletToSelect, #walletnum").prop('disabled', false);
+        });
+
+        $(".perkdrop4").click(function() {
+            $('.dp1').slideUp();
+            $('.dp2').slideUp();
+            $('.dp3').slideUp();
+            $("#mnth, #yr, #ccv, #ccnum").prop('disabled', true);
+            $("#bankToSelect").prop('disabled', true);
+            $("#walletToSelect, #walletnum").prop('disabled', true);
         });
 
         $("#mnth, #yr, #ccv, #ccnum").inputFilter(function(value) {
@@ -369,15 +529,20 @@
         });
 
         // proceed checkout form
-        $('#proceedCheckout').click(function() {
+        $('#proceedCheckout').click(function(e) {
             $('#cover-spin').show();
-
+            e.preventDefault();
             //payment type direct transfer
             if ($("input[name=payment-type]:checked").val() === 'direct-transfer') {
                 getDirectTransferResponse();
                 return true;
             }
-
+            //payment type wallet and qris
+            else if ($("input[name=payment-type]:checked").val() === 'wallet' || $("input[name=payment-type]:checked").val() === 'qris') {
+                getNicepayResponse();
+                return true;
+            }
+            
             // card data from customer input, for example
             var cardData = {
                 "card_number": $("#ccnum").val(),
@@ -385,13 +550,11 @@
                 "card_exp_year": $("#yr").val(),
                 "card_cvv": $("#ccv").val(),
             };
-
             // callback functions
             var options = {
                 onSuccess: function(response) {
                     // Success to get card token_id, implement as you wish here
                     var token_id = response.token_id;
-
                     $('#mToken').val(token_id);
                     getPaymentResponse();
                 },
@@ -402,11 +565,9 @@
                         icon: "error",
                         buttons: "OK"
                     });
-
                     $('#cover-spin').hide();
                 }
             };
-
             // trigger `getCardToken` function
             MidtransNew3ds.getCardToken(cardData, options);
         });
@@ -421,7 +582,6 @@
             name: '_token',
             value: '<?php echo csrf_token() ?>'
         });
-
         $.ajax({
             type: 'POST',
             url: '{{route("checkout-process")}}',
@@ -461,7 +621,6 @@
             },
             error: function(xhr, status, error) {
                 $('#cover-spin').hide();
-
                 swal({
                     text: xhr.responseText,
                     title: "Error at processing request",
@@ -471,11 +630,9 @@
             }
         });
     }
-
     // 3ds Aunthentication
     function showAuthentication(urlRedirect) {
         var redirect_url = urlRedirect;
-
         // callback functions
         var options = {
             performAuthentication: function(redirect_url) {
@@ -515,21 +672,59 @@
                 window.location.replace('{{url("/checkout/finish")}}/' + $("#productCode").val() + '/1');
             }
         };
-
         // trigger `authenticate` function
         MidtransNew3ds.authenticate(redirect_url, options);
     }
-
     /**
-     * Process direct transfer payment
+     * get nicepay payment response
      */
-    function getDirectTransferResponse() {
+    function getNicepayResponse() {
         var data = $('#paymentForm').serializeArray();
         data.push({
             name: '_token',
             value: '<?php echo csrf_token() ?>'
         });
+        $.ajax({
+            type: 'POST',
+            url: '{{route("checkout-process")}}',
+            data: data,
+            dataType: 'json',
+            success: function(data) {
+                $('#cover-spin').hide();
+                if (data.status_code === 300) {
+                    swal({
+                        text: data.status_message,
+                        title: "Error Data",
+                        icon: "error",
+                        buttons: "OK"
+                    }).then((value) => {
+                        window.location = "{{url('/checkout/step1')}}/" + $("#productCode").val();
+                    });
+                }else{
+                    window.location = data.link;
+                }
+            },
+            error: function(xhr, status, error) {
+                $('#cover-spin').hide();
+                swal({
+                    text: xhr.responseText,
+                    title: "Error at processing request",
+                    icon: "error",
+                    buttons: "OK"
+                })
+            }
+        });
+    }
 
+    /**
+     * Process direct transfer payment
+     */
+     function getDirectTransferResponse() {
+        var data = $('#paymentForm').serializeArray();
+        data.push({
+            name: '_token',
+            value: '<?php echo csrf_token() ?>'
+        });
         $.ajax({
             type: 'POST',
             url: '{{route("checkout-process")}}',
@@ -559,7 +754,6 @@
             },
             error: function(xhr, status, error) {
                 $('#cover-spin').hide();
-
                 swal({
                     text: xhr.responseText,
                     title: "Error at processing request",

@@ -63,6 +63,14 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <div class="row mt-3">
+                                    <div class="col">
+                                        <textarea name="address" class="form-control" cols="30" rows="5" placeholder="Your Address*">{{ old('address')}}</textarea>
+                                        @error('address')
+                                        <span class="text-danger"><i>{{ $message }}</i></span>
+                                        @enderror
+                                    </div>
+                                </div>
                                 <div class="form-check mt-3">
                                     <div class="col">
                                         <input class="form-check-input" type="checkbox" value="" id="tncCheck">

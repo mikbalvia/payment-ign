@@ -12,6 +12,6 @@ class PaymentAdditionalProduct extends Model
      * @var array
      */
     protected $fillable = [
-        'payment_id', 'additional_product_id'
+        'payment_id', 'additional_product_id', 'quantity'
     ];
 }
