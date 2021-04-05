@@ -34,7 +34,12 @@ Route::post('/storeCustomerInfo/{id}', 'CheckoutController@storeCustomerInfo')->
 Route::get('/getPrefixNumber', 'CheckoutController@getPrefixNumber')->name('get-prefix-number');
 Route::post('/checkoutProcess', 'CheckoutController@process')->name('checkout-process');
 Route::get('/checkout/finish/{id}/{channel}', 'CheckoutController@finish')->name('checkout-finish');
+Route::get('checkout/nc-finish',  'CheckoutController@callbackNicepay');
+Route::get('/checkout/qrcode', function () { return view('checkout.qrcode');});
 Route::get('/checkout/step2/{id}', function ($id = null, Request $request) {
+
+    //session cart
+    $cart= $request->session()->get('cart');
 
     //check wheter product and user is exist
     $product = ($id) ? Product::where('code', $id)->with('additionalProduct')->get() : "";
@@ -43,8 +48,8 @@ Route::get('/checkout/step2/{id}', function ($id = null, Request $request) {
     } else {
         return redirect('/checkout/step1/' . $product[0]->code);
     }
-
-    return view('checkout.payment-method', compact('product', 'user'));
+    //$user = User::find(1);
+    return view('checkout.payment-method', compact('product', 'user', 'cart'));
 })->name('payment');
 
 Auth::routes();
@@ -62,3 +67,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/transaction/{id}/edit', 'TransactionController@edit')->name('transaction.edit');
     Route::put('/transaction/{id}', 'TransactionController@update')->name('transaction.update');
 });
+
+Route::get('/test', function () {
+    return 'for test';
+});
+
+
+
+

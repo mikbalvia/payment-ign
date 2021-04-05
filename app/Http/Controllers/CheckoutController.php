@@ -13,6 +13,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Http;
 use App\Http\Requests\StoreCustomerInfo;
 use App\Jobs\SendEmailJob;
 use App\User;
@@ -24,6 +25,7 @@ use App\Models\Product;
 use App\Models\AdditionalProduct;
 use App\Models\PaymentAdditionalProduct;
 use Illuminate\Support\Facades\Log;
+use URL;
 
 class CheckoutController extends Controller
 {
@@ -33,14 +35,17 @@ class CheckoutController extends Controller
      * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index($id, Request $request)
     {
         $productId = $id;
         $product = ($productId) ? Product::where('code', $productId)->get()->toArray() : "";
         if (!count($product)) {
             abort(404);
         }
-
+        if (isset($_GET['data'])) {
+            $cart=(json_decode(base64_decode($_GET['data'])));
+            $request->session()->put('cart',$cart);
+        }
         return view('checkout.index', compact('productId', 'product'));
     }
 
@@ -59,6 +64,7 @@ class CheckoutController extends Controller
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
+            'address' => $request->address,
             'phone' => $completeNumber,
             'country' => $countryCode[1],
             'user_type' => 2
@@ -95,19 +101,21 @@ class CheckoutController extends Controller
      */
     public function process(Request $request)
     {
+        $request->session()->forget('cart');
         $payment = $request->all();
         $userId = $request->cookie('piu');
         $user = ($userId) ? User::find($userId) : "";
+        //$user = User::find(1);
         $product = ($payment['productId']) ? Product::find($payment['productId']) : "";
         $orderId = "ign-" . time() . mt_rand() . "-" . $user->id . "-" . $product->id;
         $bank = [1 => 'Mandiri', 2 => 'CIMB', 3 => 'BCA'];
-
+        
         if ($user && $product) {
             $amount=$product->price;
             if (isset($payment['addItem'])) {
                 foreach ($payment['addItem'] as $key => $value) {
                     $item=AdditionalProduct::find($value);
-                    $amount=$amount+$item->price;
+                    $amount=$amount+($item->price * (int)$request['qty'][$key]);
                 }
             }
             
@@ -136,6 +144,7 @@ class CheckoutController extends Controller
                             $paymentAdditionalProduct = PaymentAdditionalProduct::create([
                                 'payment_id' => $payment->id,
                                 'additional_product_id' => $value,
+                                'quantity' => (int)$request['qty'][$key]
                             ]);
                             
                         }
@@ -149,6 +158,57 @@ class CheckoutController extends Controller
                 }
 
                 return response()->json($paymentResponse);
+            } elseif ($payment['payment-type'] === "wallet" || $payment['payment-type'] === "qris") {
+                $paymentResponse = $this->getPaymentResponseNicepay($payment, $user, $product, $orderId,$amount);
+                Log::channel('daily')->info("[RESPONSE]" . json_encode($paymentResponse));
+                
+                if (isset($paymentResponse->resultCd) && $paymentResponse->resultCd=="0000") {
+                    $payment = Payment::create([
+                        'order_id' => $orderId,
+                        'user_id' => $user->id,
+                        'amount' => $amount,
+                        'payment_type' => $payment['payment-type'] === "wallet" ? $payment['walletToSelect'] : $payment['payment-type'],
+                        'product_id' => $payment['productId'],
+                        'transaction_id' => $paymentResponse->tXid,
+                        'status_message' => $paymentResponse->resultMsg,
+                        'status_code' => $paymentResponse->resultCd,
+                        'transaction_status' => 'pending',
+                        'transaction_time' => $paymentResponse->transDt.$paymentResponse->transTm,
+                        'currency' => $paymentResponse->currency
+                    ]);
+                    if (isset($request['addItem'])) {
+                        foreach ($request['addItem'] as $key => $value) {
+                            $paymentAdditionalProduct = PaymentAdditionalProduct::create([
+                                'payment_id' => $payment->id,
+                                'additional_product_id' => $value,
+                                'quantity' => (int)$request['qty'][$key]
+                            ]);
+                            
+                        }
+                    }
+                    $time=date('Ymd').date('His');
+                    $callBackUrl=URL::to('/').'/checkout/nc-finish';
+                    $merchantToken=$this->merchantToken($time,$orderId,$amount);
+                    if ($request['payment-type'] === "wallet") {
+                        $link = "https://www.nicepay.co.id/nicepay/direct/v2/payment"."?tXid=".$paymentResponse->tXid."&timeStamp=".$time."&callBackUrl=".$callBackUrl."&merchantToken=".$merchantToken;
+                    }else{
+                        $link = URL::to('/').'/checkout/qrcode?paymentExpDt='.$paymentResponse->paymentExpDt.'&paymentExpTm='.$paymentResponse->paymentExpTm.'&qrUrl='.$paymentResponse->qrUrl.'&amt='.$paymentResponse->amt.'&referenceNo='.$paymentResponse->referenceNo.'&tXid='.$paymentResponse->tXid;
+                    }
+
+                    $data['status_code'] = 200;
+                    $data['status_message'] = "Success, Please complete your payment";
+                    $data['link'] = $link;
+                    return response()->json($data);
+                    
+                    
+                    
+                    
+                }else{
+                    $data['status_code'] = 300;
+                    $data['status_message'] = "Error processing payment";
+
+                    return response()->json($data);
+                }
             } else {
                 
                 $payment = Payment::create([
@@ -166,15 +226,17 @@ class CheckoutController extends Controller
                         $paymentAdditionalProduct = PaymentAdditionalProduct::create([
                             'payment_id' => $payment->id,
                             'additional_product_id' => $value,
+                            'quantity' => (int)$request['qty'][$key]
                         ]);
                         
                     }
                 }
+                
                 $data['status_code'] = 200;
                 $data['status_message'] = "Success, Please complete your payment";
                 $data['bank'] = $payment['bankToSelect'];
 
-                dispatch(new SendEmailJob($user, $product, $payment));
+                //dispatch(new SendEmailJob($user, $product, $payment));
 
                 return response()->json($data);
             }
@@ -217,6 +279,78 @@ class CheckoutController extends Controller
 
         Log::channel('daily')->info("[REQUEST]" . json_encode($params));
         return SendPaymentResponse::charge($params);
+    }
+
+    /**
+     * Get Payment response from nicepay
+     *
+     * @param array $data
+     * @return json 
+     */
+
+    public function getPaymentResponseNicepay($data, $user, $product, $orderId, $amount)
+    {
+        $time=date('Ymd').date('His');
+        $merchantToken=$this->merchantToken($time,$orderId,$amount);
+        if ($data['payment-type']=='qris') {
+            $cart="{}";
+            $payMethod='08';
+            $mitraCd="QSHP";
+        }else{
+            $payMethod='05';
+            $mitraCd=$data['walletToSelect'];
+            if($data['walletToSelect'] == "OVOE"){
+
+                $cart="{\"count\": \"1\",\"item\": [{\"img_url\": \"http://img.aaa.com/ima1.jpg\",\"goods_name\": \" $product->name\",\"goods_detail\": \"\",\"goods_amt\":" . "\"" . $amount . "\"}]}";
+            } else{
+                $cart="{\"count\": \"1\",\"item\": [{\"img_url\": \"http://img.aaa.com/ima1.jpg\",\"goods_name\": \" $product->name\",\"goods_quantity\": \"1\",\"goods_detail\": \".\",\"goods_amt\":" . "\"" . $amount . "\"}]}";
+            }
+        }
+        
+        $params=array (
+            'timeStamp' => $time,
+            'iMid' => env('NICEPAY_IMID'),
+            'payMethod' => $payMethod,
+            'currency' => 'IDR',
+            'amt' => $amount,
+            'referenceNo' => $orderId,
+            'merchantToken' => $merchantToken,
+            'goodsNm' => $product->name,
+            'billingNm' => $user->firstname.' '.$user->lastname,
+            'billingPhone' => $data['payment-type']=='qris' ? $user->phone : $data['wallet-number'],
+            'billingEmail' => $user->email,
+            'billingAddr' => 'Jl. Tole Iskandar No.19 A, Mekar Jaya, Kec. Sukmajaya',
+            'billingCity' => 'Depok',
+            'billingState' => 'Jawa Barat',
+            'billingPostCd' => '16412',
+            'billingCountry' => 'ID',
+            'dbProcessUrl' => URL::to('/').'/api/checkout/notificationNicepay',
+            'description' => '',
+            'userIP' => '0:0:0:0:0:0:0:1',
+            'cartData' => $cart,
+            'mitraCd' => $mitraCd,
+        );
+        if ($data['payment-type']=='qris') {
+            $params=array_merge($params,['shopId' => env('NICEPAY_SHOP_ID')]);
+        }
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json'
+        ])->post('https://www.nicepay.co.id/nicepay/direct/v2/registration', $params);
+        $response=json_decode($response);
+        return $response;
+        
+
+    }
+
+    /**
+     * Create merchant token for nicepay
+     *
+     * @param  $time,$amt,$referenceNo
+     * @return hash
+     */
+    public function merchantToken($time,$referenceNo,$amt) {
+        return hash('sha256', $time.env('NICEPAY_IMID').$referenceNo.$amt.env('NICEPAY_MERCHANT_KEY'));
     }
 
     /**
@@ -298,6 +432,55 @@ class CheckoutController extends Controller
     }
 
     /**
+     * Receive notification from nicepay
+     *
+     * @param Request $request
+     * @return string 
+     */
+    public function notificationNicepay(Request $request)
+    {
+        Log::channel('daily')->info("[REQUEST]" . json_encode($_REQUEST));
+
+        $payment = DB::table('payments')->where('order_id', '=', $_REQUEST['referenceNo'])->get();
+
+        
+        if ($payment) {
+            $payment = Payment::find($payment[0]->id);
+            $status='';
+            if ($_REQUEST['status']==0) {
+                $status='Paid';
+            }elseif ($_REQUEST['status']==1) {
+                $status='Void';
+            }
+            elseif ($_REQUEST['status']==8) {
+                $status='Fail';
+            }
+            elseif ($_REQUEST['status']==9) {
+                $status='Init';
+            }elseif ($_REQUEST['status']==2) {
+                $status='Refund';
+            }elseif ($_REQUEST['status']==3) {
+                $status='Unpaid';
+            }
+            elseif ($_REQUEST['status']==4) {
+                $status='Processing';
+            }
+            elseif ($_REQUEST['status']==5) {
+                $status='Expired';
+            }
+
+            if ($status) {
+                $payment->transaction_status = $result->resultMsg;
+                $payment->save();
+            }
+        }
+
+            
+        
+        
+    }
+
+    /**
      * Update payment status by midtrans notification
      *
      * @param $request, $response
@@ -312,5 +495,68 @@ class CheckoutController extends Controller
         $payment->transaction_time = $response->transaction_time;
         $payment->bank = $response->bank;
         $payment->save();
+    }
+
+    /**
+     * Update payment status by nicepay callback
+     *
+     * @param $request, $response
+     * @return void 
+     */
+
+    public function callbackNicepay(Request $request)
+    {
+        $requestData = array();
+        $requestData['iMid'] = env('NICEPAY_IMID');
+        $requestData['merchantKey'] = env('NICEPAY_MERCHANT_KEY');
+        $requestData['amt'] = $_GET['amt'];
+        $requestData['referenceNo'] = $_GET['referenceNo'];
+        $requestData['merchantToken'] = hash('sha256', $requestData['iMid'].$requestData['referenceNo'].$requestData['amt'].$requestData['merchantKey']);
+        $requestData['tXid'] = $_GET['tXid'];
+
+        $postData = '';
+        foreach ($requestData as $key => $value) {
+        $postData .= urlencode($key) . '='.urlencode($value).'&';
+        }
+        $postData = rtrim($postData, '&');
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://www.nicepay.co.id/nicepay/api/onePassStatus.do');
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        $curl_result = curl_exec($ch);
+        $result = json_decode($curl_result);
+        
+        $payment = DB::table('payments')->where('order_id', '=', $result->referenceNo)->get();
+
+        //Process Response Nicepay
+        if(isset($result->resultCd) && $result->resultCd == '0000'){
+            if ($payment) {
+                $payment = Payment::find($payment[0]->id);
+                $payment->transaction_status = $result->resultMsg;
+                $payment->transaction_time = $result->reqDt.$result->reqTm;
+                $payment->save();
+                if ($payment) {
+                    return view('checkout.thankyou-nicepay',compact('payment','result'));
+                }
+            }
+
+            
+        }
+        elseif (isset($result->resultCd)) {
+            echo "<pre>";
+            echo "result code       :".$result->resultCd."\n";
+            echo "result message    :".$result->resultMsg."\n";
+            echo "</pre>";
+        }
+        else {
+            //return view('checkout.thankyou-nicepay',compact('payment'));
+            echo "<pre>";
+            echo "Timeout When Checking Payment Status";
+            echo "</pre>";
+        }
     }
 }

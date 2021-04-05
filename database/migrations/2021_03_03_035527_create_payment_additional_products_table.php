@@ -16,7 +16,8 @@ class CreatePaymentAdditionalProductsTable extends Migration
         Schema::create('payment_additional_products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('payment_id')->constrained('payments')->onDelete('cascade')->onUpdate('cascade');
-            $table->bigInteger('additional_product_id')->nullable();
+            $table->bigInteger('additional_product_id');
+            $table->integer('quantity');
             $table->timestamps();
         });
     }
