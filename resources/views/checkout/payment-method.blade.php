@@ -15,6 +15,23 @@
                             @else
                             <img src="<?php echo asset('/images/no-image.jpg') ?>" class="img-fluid" alt="Responsive image" />
                             @endif
+                            <div class="d-none d-sm-block">
+                                <p>Informasi Pembayaran:</p>
+                                <ol>
+                                    <li>Silahkan Isi data Anda dengan lengkap dan benar.</li>
+                                    <li>Setelah melakukan pembayaran silahkan kirimkan bukti pembayaran Anda ke Whatsapp +62895396903642 dengan format Nama_Bukti Pembayaran</li>
+                                    <li>Pembayaran akan kami cek paling lama 2x24 jam (Hari kerja)</li>
+                                    <li>Informasi Resi akan dikirimkan setelah pembayaran terkonfirmasi</li>
+                                    <li>Butuh bantuan? Klik tombol WA dibawah ini dan tim kami akan membantu Anda</li>
+                                    
+                                </ol>
+                                <div class="col text-center">
+                                    <a href="https://wa.me/+62895396903642" target="_blank" type="" class="btn btn-success w-50">
+                                        <h5 class="font-italic pt-1"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp</h5>
+                                    </a>
+                                </div>
+
+                            </div>
                         </div>
                         <div class="col-lg-6 pt-4">
                             <div class="row">
@@ -29,10 +46,10 @@
                             </div>
                             <div class="row pt-2">
                                 <div class="col">
-                                    <h4 class="mb-4">Your Order</h4>
+                                    <h4 class="mb-4">Order Anda</h4>
                                     <div class="row">
                                         <div class="col">
-                                            <p class="text-left"><b>Product</b></p>
+                                            <p class="text-left"><b>Produk</b></p>
                                         </div>
                                         <div class="col">
                                             <p class="text-right"><b>Subtotal</b></p>
@@ -329,6 +346,27 @@
                                         </button>
                                     </div>
                                 </div>
+                                <div class="row mt-3">
+                                    <div class="col">
+                                        <div class="d-block d-sm-none">
+                                            <p>Informasi Pembayaran:</p>
+                                            <ol>
+                                                <li>Silahkan Isi data Anda dengan lengkap dan benar.</li>
+                                                <li>Setelah melakukan pembayaran silahkan kirimkan bukti pembayaran Anda ke Whatsapp +62895396903642 dengan format Nama_Bukti Pembayaran</li>
+                                                <li>Pembayaran akan kami cek paling lama 2x24 jam (Hari kerja)</li>
+                                                <li>Informasi Resi akan dikirimkan setelah pembayaran terkonfirmasi</li>
+                                                <li>Butuh bantuan? Klik tombol WA dibawah ini dan tim kami akan membantu Anda</li>
+                                                
+                                            </ol>
+                                            <div class="col text-center">
+                                                <a href="https://wa.me/+62895396903642" target="_blank" type="" class="btn btn-success w-50">
+                                                    <h5 class="font-italic pt-1"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp</h5>
+                                                </a>
+                                            </div>
+            
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -593,7 +631,7 @@
                 } else if (data.status_code === '200') {
                     swal({
                         text: data.status_message,
-                        title: "Payment Success",
+                        title: "Permintaan Berhasil",
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {
@@ -647,7 +685,7 @@
                 $('#pinModal').modal('hide');
                 swal({
                     text: response.status_message,
-                    title: "Payment Success",
+                    title: "Permintaan Berhasil",
                     icon: "success",
                     buttons: "OK"
                 }).then((value) => {
@@ -744,7 +782,7 @@
                 } else {
                     swal({
                         text: data.status_message,
-                        title: "Request Success",
+                        title: "Permintaan Berhasil",
                         icon: "success",
                         buttons: "OK"
                     }).then((value) => {

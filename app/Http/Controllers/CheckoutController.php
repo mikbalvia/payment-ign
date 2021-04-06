@@ -57,16 +57,18 @@ class CheckoutController extends Controller
      */
     public function storeCustomerInfo(StoreCustomerInfo $request, $id)
     {
-        $countryCode = explode("|", $request->prefixNumber);
-        $completeNumber = preg_replace('/^0?/', '+' . $countryCode[0], $request->phone);
+        //$countryCode = explode("|", $request->prefixNumber);
+        //$completeNumber = preg_replace('/^0?/', '+' . $countryCode[0], $request->phone);
 
         $user = User::create([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
             'address' => $request->address,
-            'phone' => $completeNumber,
-            'country' => $countryCode[1],
+            'phone' => $request->phone,
+            'post_code' => $request->post_code,
+            //'country' => $countryCode[1],
+            'country' => 100,
             'user_type' => 2
         ]);
 
@@ -196,7 +198,7 @@ class CheckoutController extends Controller
                     }
 
                     $data['status_code'] = 200;
-                    $data['status_message'] = "Success, Please complete your payment";
+                    $data['status_message'] = "Silahkan Selesaikan Pembayaran Anda";
                     $data['link'] = $link;
                     return response()->json($data);
                     
@@ -233,7 +235,7 @@ class CheckoutController extends Controller
                 }
                 
                 $data['status_code'] = 200;
-                $data['status_message'] = "Success, Please complete your payment";
+                $data['status_message'] = "Silahkan Selesaikan Pembayaran Anda";
                 $data['bank'] = $payment['bankToSelect'];
 
                 //dispatch(new SendEmailJob($user, $product, $payment));
@@ -470,7 +472,7 @@ class CheckoutController extends Controller
             }
 
             if ($status) {
-                $payment->transaction_status = $result->resultMsg;
+                $payment->transaction_status = $status;
                 $payment->save();
             }
         }

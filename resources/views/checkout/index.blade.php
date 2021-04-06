@@ -13,6 +13,23 @@
                             @else
                             <img src="<?php echo asset('/images/no-image.jpg') ?>" class="img-fluid" alt="Responsive image" />
                             @endif
+                            <div class="d-none d-sm-block">
+                                <p>Informasi Pembayaran:</p>
+                                <ol>
+                                    <li>Silahkan Isi data Anda dengan lengkap dan benar.</li>
+                                    <li>Setelah melakukan pembayaran silahkan kirimkan bukti pembayaran Anda ke Whatsapp +62895396903642 dengan format Nama_Bukti Pembayaran</li>
+                                    <li>Pembayaran akan kami cek paling lama 2x24 jam (Hari kerja)</li>
+                                    <li>Informasi Resi akan dikirimkan setelah pembayaran terkonfirmasi</li>
+                                    <li>Butuh bantuan? Klik tombol WA dibawah ini dan tim kami akan membantu Anda</li>
+                                    
+                                </ol>
+                                <div class="col text-center">
+                                    <a href="https://wa.me/+62895396903642" target="_blank" type="" class="btn btn-success w-50">
+                                        <h5 class="font-italic pt-1"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp</h5>
+                                    </a>
+                                </div>
+
+                            </div>
                         </div>
                         <div class="col-lg-6 pt-4">
                             <div class="row">
@@ -31,13 +48,13 @@
                                 @csrf
                                 <div class="form-row">
                                     <div class="col">
-                                        <input type="text" name="firstname" class="form-control" placeholder="First name*" value="{{ old('firstname') }}">
+                                        <input type="text" name="firstname" class="form-control" placeholder="Nama depan*" value="{{ old('firstname') }}">
                                         @error('firstname')
                                         <span class="text-danger"><i>{{ $message }}</i></span>
                                         @enderror
                                     </div>
                                     <div class="col">
-                                        <input type="text" name="lastname" class="form-control" placeholder="Last name">
+                                        <input type="text" name="lastname" class="form-control" placeholder="Nama belakang*">
                                     </div>
                                 </div>
                                 <div class="row mt-3">
@@ -49,15 +66,15 @@
                                     </div>
                                 </div>
                                 <div class="form-row mt-3">
-                                    <div class="col-4">
+                                    {{-- <div class="col-4">
                                         <select class="form-control prefix-number" name="prefixNumber">
                                         </select>
                                         @error('prefix-number')
                                         <span class="text-danger"><i>{{ $message }}</i></span>
                                         @enderror
-                                    </div>
-                                    <div class="col-8">
-                                        <input type="text" class="form-control" name="phone" id="phne" maxlength="15" placeholder="Phone*" value="{{ old('phone') }}">
+                                    </div> --}}
+                                    <div class="col">
+                                        <input type="text" class="form-control" name="phone" id="phne" maxlength="15" placeholder="No Handphone atau whatsapp*" value="{{ old('phone') }}">
                                         @error('phone')
                                         <span class="text-danger"><i>{{ $message }}</i></span>
                                         @enderror
@@ -65,8 +82,16 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col">
-                                        <textarea name="address" class="form-control" cols="30" rows="5" placeholder="Your Address*">{{ old('address')}}</textarea>
+                                        <textarea name="address" class="form-control" cols="30" rows="5" placeholder="Alamat lengkap*">{{ old('address')}}</textarea>
                                         @error('address')
+                                        <span class="text-danger"><i>{{ $message }}</i></span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="form-row mt-3">
+                                    <div class="col">
+                                        <input type="text" class="form-control" name="post_code" placeholder="Kode Pos*" value="{{ old('post_code') }}">
+                                        @error('post_code')
                                         <span class="text-danger"><i>{{ $message }}</i></span>
                                         @enderror
                                     </div>
@@ -75,7 +100,7 @@
                                     <div class="col">
                                         <input class="form-check-input" type="checkbox" value="" id="tncCheck">
                                         <label class="form-check-label" for="defaultCheck1">
-                                            <p>Check here to indicate that you have read and agree to the <a target="_blank" rel="noopener noreferrer" href="{{$product[0]['tnc_url']}}">Term and Conditions</a></p>
+                                            <p>Centang di sini untuk menunjukkan bahwa Anda telah membaca dan menyetujui <a target="_blank" rel="noopener noreferrer" href="{{$product[0]['tnc_url']}}">Syarat dan ketentuan</a></p>
                                         </label>
                                     </div>
                                 </div>
@@ -86,6 +111,29 @@
                                         </button>
                                     </div>
                                 </div>
+
+                                <div class="row mt-3">
+                                    <div class="col">
+                                        <div class="d-block d-sm-none">
+                                            <p>Informasi Pembayaran:</p>
+                                            <ol>
+                                                <li>Silahkan Isi data Anda dengan lengkap dan benar.</li>
+                                                <li>Setelah melakukan pembayaran silahkan kirimkan bukti pembayaran Anda ke Whatsapp +62895396903642 dengan format Nama_Bukti Pembayaran</li>
+                                                <li>Pembayaran akan kami cek paling lama 2x24 jam (Hari kerja)</li>
+                                                <li>Informasi Resi akan dikirimkan setelah pembayaran terkonfirmasi</li>
+                                                <li>Butuh bantuan? Klik tombol WA dibawah ini dan tim kami akan membantu Anda</li>
+                                                
+                                            </ol>
+                                            <div class="col text-center">
+                                                <a href="https://wa.me/+62895396903642" target="_blank" type="" class="btn btn-success w-50">
+                                                    <h5 class="font-italic pt-1"><i class="fa fa-whatsapp" aria-hidden="true"></i> Whatsapp</h5>
+                                                </a>
+                                            </div>
+            
+                                        </div>
+                                    </div>
+                                </div>
+
                             </form>
                         </div>
                     </div>
