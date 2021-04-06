@@ -26,9 +26,10 @@ class StoreCustomerInfo extends FormRequest
         return [
             'firstname' => 'required|max:100',
             'email' => 'required|email',
-            'prefixNumber' => 'required',
+            //'prefixNumber' => 'required',
             'phone' => 'required|numeric',
-            'address' => 'required'
+            'address' => 'required',
+            'post_code' => 'required'
         ];
     }
 
