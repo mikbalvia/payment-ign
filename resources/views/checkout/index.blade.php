@@ -3,11 +3,11 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-6 p-4 mt-3">
+                        {{-- <div class="col-lg-6 p-4 mt-3">
                             @if($product[0]['image'])
                             <img src="<?php echo asset($product[0]['image']) ?>" class="img-fluid" alt="Responsive image" />
                             @else
@@ -30,8 +30,8 @@
                                 </div>
 
                             </div>
-                        </div>
-                        <div class="col-lg-6 pt-4">
+                        </div> --}}
+                        <div class="col-lg-12 pt-4">
                             <div class="row">
                                 <div class="steps col py-3">
                                     <div class="now">
@@ -114,7 +114,7 @@
 
                                 <div class="row mt-3">
                                     <div class="col">
-                                        <div class="d-block d-sm-none">
+                                        <div class="">
                                             <p>Informasi Pembayaran:</p>
                                             <ol>
                                                 <li>Silahkan Isi data Anda dengan lengkap dan benar.</li>

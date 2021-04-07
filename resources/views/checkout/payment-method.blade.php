@@ -5,11 +5,11 @@
     @include('sweet::alert')
     @include('checkout.modal')
     <div class="row justify-content-center">
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-lg-6 p-4">
+                        {{-- <div class="col-lg-6 p-4">
                             @if($product[0]->image)
                             <img src="<?php echo asset($product[0]->image) ?>" class="img-fluid" alt="Responsive image" />
                             @else
@@ -32,8 +32,8 @@
                                 </div>
 
                             </div>
-                        </div>
-                        <div class="col-lg-6 pt-4">
+                        </div> --}}
+                        <div class="col-lg-12 pt-4">
                             <div class="row">
                                 <div class="steps col py-3">
                                     <div class="now">
@@ -87,7 +87,7 @@
                                     @endphp
                                     <div class="row table-additional" id="table-additional-{{$item->id}}">
                                         <div class="col">
-                                            <p class="text-left">{{$item->name}}</p>
+                                            <p class="text-left">{{$item->name}} x {{$qty}}</p>
                                         </div>
                                         <div class="col">
                                             <b><p class="text-right subtotal-add" data-id="{{$item->id}}" data-price="{{$item->price}}">USD {{number_format($item->price / env('USD_RATE'),2)}} / IDR {{number_format($item->price*$qty,0,',','.')}}</p></b>
@@ -118,47 +118,46 @@
 
                             @foreach ($product[0]->additionalProduct as $item)
 
-                            @php
-                                $qty=1;
+                            <?php
                                 if (isset($cart)) {
                                     foreach($cart as $value){
                                         if($value->id==$item->id){
-                                        $qty=$value->qty; 
-                                        break;
-                                        }else{
-                                            $qty=1;
-                                        }
-                                    }
-                                }
 
-                            @endphp
+                            ?>
                             
                             <div class="row p-3">
-                                <div class="col card p-2" style="flex-direction: row">
-                                    <div class="col-md-4">
+                                <div class="row card p-2" style="flex-direction: row">
+                                    <div class="col-md-12">
                                         <img src="<?php echo asset($item->image) ?>" alt="" width="100%">
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <p class="font-weight-bold">{{$item->name}}</p>
                                         <p class="font-weight-bold">USD {{number_format($item->price / env('USD_RATE'),2)}} / IDR {{number_format($item->price,0,',','.')}}</p>
                                         <p>{{$item->desc}}</p>
 
-                                        <div class="form-group" id="qty-additional-{{$item->id}}" style="display: none">
+                                        <div class="form-group" id="qty-additional-{{$item->id}}" style="display: none;opacity: 0;height:0px">
                                             <div class="d-flex">
                                                 <label style="margin-right:10px"><span>Qty</span></label>
                                                 <div class="input-group">
-                                                    <input type="number" class="inp-qty" name="qty-f" min="1" value="{{$qty}}" id="inp-qty-add-{{$item->id}}" data-id="{{$item->id}}" data-price="{{$item->price}}" required style="width:50px">
+                                                    <input type="number" class="inp-qty" name="qty-f" min="1" value="{{$value->qty}}" id="inp-qty-add-{{$item->id}}" data-id="{{$item->id}}" data-price="{{$item->price}}" required style="width:50px">
                                                 </div>
                                             </div>
                                             
                                         </div>
 
-                                        <button id="add-rem-item-{{$item->id}}" type="button" class="btn btn-info w-90 add-rem-item" data-process='add' data-add-rem-item-id="{{$item->id}}" data-add-rem-item-price-usd="{{number_format($item->price / env('USD_RATE'),0)}}" data-add-rem-item-price-idr="{{number_format($item->price,0,',','.')}}">
+                                        <button id="add-rem-item-{{$item->id}}" type="button" class="btn btn-info w-90 add-rem-item" data-process='add' data-add-rem-item-id="{{$item->id}}" data-add-rem-item-price-usd="{{number_format($item->price / env('USD_RATE'),0)}}" data-add-rem-item-price-idr="{{number_format($item->price,0,',','.')}}" style="opacity: 0;height:0px">
                                             <p style="color: white;margin:0"><i class="fa fa-plus" aria-hidden="true"></i> Add</p>
                                         </button>
                                     </div>
                                 </div>
                             </div>
+
+                            <?php
+                                        }
+                                    }
+                                        
+                                }
+                            ?>
                                 
                             @endforeach
                             
@@ -348,7 +347,7 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col">
-                                        <div class="d-block d-sm-none">
+                                        <div class="">
                                             <p>Informasi Pembayaran:</p>
                                             <ol>
                                                 <li>Silahkan Isi data Anda dengan lengkap dan benar.</li>
